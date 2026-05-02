@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "NIKY Store"
+version = "1.0.0"
+id = "artifacts/niky-store"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 18217
+
+[services.development]
+run = "pnpm --filter @workspace/niky-store run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/niky-store", "run", "build" ]
+publicDir = "artifacts/niky-store/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18217"
+BASE_PATH = "/"

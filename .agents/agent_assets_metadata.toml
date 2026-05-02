@@ -1,0 +1,14 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "-ferxzI2ozbK3mmwWBmNu"
+uri = "file://artifacts/niky-store/src/assets/hero-banner.png"
+type = "image"
+title = "Hero banner dark shoe"
+
+[[generated]]
+id = "DnOphHgegC85n_xelhRt0"
+uri = "file://artifacts/niky-store/src/assets/banner-secondary.png"
+type = "image"
+title = "Red accent shoe"
