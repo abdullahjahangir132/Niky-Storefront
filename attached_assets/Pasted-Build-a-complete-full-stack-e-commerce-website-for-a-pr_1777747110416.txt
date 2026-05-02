@@ -1,0 +1,666 @@
+Build a complete full-stack e-commerce website for a premium shoe store 
+called "NANO SHOES". The website should look and feel exactly like Nike.ae — 
+clean, bold, black & white aesthetic with sharp accents, full-screen hero 
+sections, smooth animations, and a luxury sportswear feel.
+
+================================================================
+STORE NAME: NANO SHOES
+TAGLINE: "Move Beyond Limits"
+LOGO: Bold text "NANO" with "SHOES" underneath in smaller caps
+================================================================
+
+==============================================================
+SECTION 1 — PUBLIC STOREFRONT (Customer Side)
+==============================================================
+
+--- PAGE 1: HOMEPAGE ---
+
+Top Announcement Bar:
+- Scrolling text: "FREE SHIPPING ON ORDERS ABOVE PKR 3000 | NEW ARRIVALS JUST DROPPED"
+- Background: Black, text: White
+
+Sticky Navbar:
+- Logo: "NANO SHOES" (left side)
+- Nav Links: Men | Women | Kids | Sale | New Arrivals | Collections
+- Icons (right side): Search, Wishlist (heart), Cart (bag with count), User/Login
+- On scroll: navbar becomes solid black with white text
+- Mobile: hamburger menu with full-screen slide-in drawer
+
+Hero Section (Full Screen):
+- Large background image (athletic shoes lifestyle shot)
+- Bold headline: "BUILT FOR THE STREETS." (Nike-style large typography)
+- Subtext: "New Season. New Moves. Shop the latest from Nano Shoes."
+- Two CTA buttons: "SHOP MEN" (black) and "SHOP WOMEN" (white outline)
+- Subtle parallax scroll effect on background image
+
+Category Showcase Section:
+- 3 large clickable image cards side by side:
+  * MEN'S (dark athletic image)
+  * WOMEN'S (lifestyle image)  
+  * KIDS' (colorful playful image)
+- Hover effect: image zooms in slightly, overlay text appears
+
+New Arrivals Section:
+- Section title: "JUST ARRIVED"
+- Horizontal scrollable row of 8 product cards
+- Each card: Product image, name, category, price, "Add to Cart" on hover
+
+Featured Collection Banner:
+- Full-width dark banner with large product image (one side)
+- Text: "THE NANO PRO COLLECTION — Engineered for Performance"
+- CTA button: "EXPLORE NOW"
+
+Best Sellers Section:
+- Grid of 4 top-selling products
+- Each with: image, product name, price, star rating, quick-add button
+
+Sale Section:
+- Red background banner
+- Text: "UP TO 50% OFF — SALE NOW LIVE"
+- Grid of 6 sale products with original price crossed out + sale price
+
+Brand Story Section:
+- Split layout: left image, right text
+- Text about Nano Shoes brand story, quality, mission
+- CTA: "Learn More About Us"
+
+Instagram / Lifestyle Grid:
+- 6 square lifestyle images in grid format
+- Overlay text: "@nanoshoes — Tag us to be featured"
+
+Newsletter Section:
+- Dark background
+- Heading: "GET EXCLUSIVE DEALS"
+- Email input + Subscribe button
+- Text: "Join 50,000+ sneaker lovers"
+
+Footer:
+- Logo + tagline
+- Links: Men, Women, Kids, Sale, About, Contact, FAQs
+- Customer Service: Shipping Info, Returns, Size Guide, Track Order
+- Social Icons: Instagram, Facebook, TikTok, YouTube
+- Bottom bar: © 2025 Nano Shoes. All Rights Reserved.
+
+--- PAGE 2: MEN'S COLLECTION PAGE ---
+URL: /collections/men
+
+- Hero banner at top: "MEN'S FOOTWEAR" with dark background
+- Left sidebar filters:
+  * Category: Running, Casual, Formal, Sports, Sandals, Boots
+  * Size: UK 6, 7, 8, 9, 10, 11, 12
+  * Color: Black, White, Red, Blue, Grey, Brown (color dot buttons)
+  * Price Range: slider (PKR 1000 - PKR 30,000)
+  * Brand: Nano Pro, Nano Air, Nano Flex, Nano Classic
+- Sort dropdown: Featured, Price Low-High, Price High-Low, Newest, Best Rated
+- Product grid: 3 columns desktop, 2 columns mobile
+- Product card:
+  * Product image (hover shows second image)
+  * "NEW" or "SALE" badge
+  * Wishlist heart icon (top right)
+  * Product name (bold)
+  * Sub-category (small text)
+  * Price (+ sale price if applicable)
+  * Available colors (small dots)
+  * "Quick Add" button on hover
+- Pagination: 12 products per page with numbered pagination
+
+--- PAGE 3: WOMEN'S COLLECTION PAGE ---
+URL: /collections/women
+
+- Same layout as Men's but with women-specific:
+  * Categories: Running, Casual, Heels, Sandals, Sneakers, Sports
+  * Sizes: UK 3, 4, 5, 6, 7, 8
+  * Different hero banner image
+  * Color palette filter includes: Pink, Nude, Rose Gold, White, Black
+
+--- PAGE 4: ALL CATEGORIES ---
+
+NANO SHOES has these main categories (each with its own page):
+1. /collections/men — Men's Shoes
+2. /collections/women — Women's Shoes
+3. /collections/kids — Kids' Shoes
+4. /collections/running — Running Shoes
+5. /collections/casual — Casual & Lifestyle
+6. /collections/formal — Formal Shoes
+7. /collections/sports — Sports & Training
+8. /collections/sandals — Sandals & Slippers
+9. /collections/sale — Sale (discounted items)
+10. /collections/new-arrivals — New Arrivals
+
+Each category page has:
+- Category hero banner with name and product count
+- Same filter sidebar + sort options
+- Product grid with pagination
+
+--- PAGE 5: SINGLE PRODUCT PAGE ---
+URL: /products/:slug
+
+Left Side — Image Gallery:
+- Large main image display
+- 4 thumbnail images below (click to change main)
+- Zoom on hover (magnifier effect)
+- "SALE" or "NEW" badge if applicable
+
+Right Side — Product Info:
+- Category breadcrumb: Home > Men > Running
+- Product Name (large bold, e.g., "NANO AIR MAX PRO")
+- Rating: 4.5 stars (87 reviews) — clickable link to reviews
+- Price: PKR 8,500 (or PKR 12,000 PKR 8,500 if on sale)
+- Short description (2-3 lines)
+
+Color Selection:
+- Label: "COLOR: Midnight Black"
+- Color swatches (circles with actual colors)
+- Selected color gets a black border ring
+
+Size Selection:
+- Label: "SIZE: UK 9" + "Size Guide" link
+- Size buttons grid: 6 | 7 | 8 | 9 | 10 | 11 | 12
+- Unavailable sizes shown grayed out
+- Size guide popup modal with measurement chart
+
+Quantity:
+- Minus / Plus buttons with number input
+- Shows "Only 3 left in stock!" warning if stock < 5
+
+Action Buttons:
+- Large black button: "ADD TO CART"
+- White outline button: "ADD TO WISHLIST ♡"
+- Below: "BUY NOW" (red button, goes to checkout directly)
+
+Product Details Accordion (expand/collapse):
+- Product Description (full details)
+- Material & Care (fabric, washing instructions)
+- Shipping & Returns (delivery time, return policy)
+- Size & Fit (fit type, who it's for)
+
+Reviews Section:
+- Overall rating display (4.5/5 with star breakdown)
+- Individual review cards: name, date, stars, review text
+- "Write a Review" button (only for logged-in users who purchased)
+
+Related Products:
+- "YOU MIGHT ALSO LIKE" section
+- 4 product cards in a row
+
+--- PAGE 6: CART PAGE ---
+URL: /cart
+
+Left Side — Cart Items:
+- Product image (small), name, size, color
+- Quantity +/- buttons
+- Price
+- Remove item (X) button
+- "Save for Later" option
+
+Coupon Section:
+- Input field: "Enter Coupon Code"
+- Apply button
+- Success: shows discount applied
+
+Right Side — Order Summary:
+- Subtotal
+- Discount (if coupon applied, shown in red)
+- Shipping (Free if above PKR 3000, else PKR 200)
+- Total (bold, large)
+- "PROCEED TO CHECKOUT" (large black button)
+- "Continue Shopping" link
+- Accepted payments icons: Visa, MasterCard, EasyPaisa, JazzCash, COD
+
+--- PAGE 7: CHECKOUT PAGE ---
+URL: /checkout
+
+Step indicator: 1. Address → 2. Payment → 3. Confirm
+
+Step 1 — Shipping Address:
+- Full Name, Email, Phone Number
+- Address Line 1, Address Line 2 (optional)
+- City, Province/State, Postal Code
+- Country (dropdown, default: Pakistan)
+- Save address checkbox (for logged-in users)
+
+Step 2 — Payment Method:
+- Radio options:
+  * Cash on Delivery (COD)
+  * Credit/Debit Card (Visa/MasterCard form fields)
+  * EasyPaisa (phone number input)
+  * JazzCash (phone number input)
+- Order summary sidebar visible
+
+Step 3 — Order Confirmation:
+- Review all items, address, payment
+- "PLACE ORDER" button (large, black)
+- Small text: "By placing order you agree to our Terms & Conditions"
+
+--- PAGE 8: ORDER CONFIRMATION PAGE ---
+URL: /order-success
+
+- Large checkmark icon (animated)
+- "ORDER PLACED SUCCESSFULLY!"
+- Order number: #NS-2025-00847
+- Estimated delivery: 3-5 business days
+- Summary of ordered items
+- Buttons: "TRACK ORDER" | "CONTINUE SHOPPING"
+- Email confirmation notice
+
+--- PAGE 9: USER ACCOUNT PAGES ---
+URL: /account
+
+Login Page (/login):
+- Email + Password inputs
+- Remember me checkbox
+- Forgot Password link
+- Login button
+- Divider: "OR"
+- Sign up link
+
+Register Page (/register):
+- Full Name, Email, Phone, Password, Confirm Password
+- Terms & conditions checkbox
+- Register button
+
+My Account Dashboard (/account):
+- Welcome message: "Welcome back, [Name]!"
+- Tabs: Orders | Wishlist | Profile | Addresses
+
+My Orders Tab:
+- Table: Order #, Date, Items, Total, Status, Action
+- Status badges: Pending (yellow), Processing (blue), 
+  Shipped (purple), Delivered (green), Cancelled (red)
+- "View Details" button for each order
+- Order Detail modal: items, address, tracking info
+
+Wishlist Tab:
+- Grid of wishlisted products
+- Each with: image, name, price, "Move to Cart" button, Remove button
+
+Profile Tab:
+- Edit: Full Name, Email, Phone
+- Change Password section
+- Profile picture upload
+
+Addresses Tab:
+- Saved addresses list
+- Add new address button
+- Edit / Delete / Set as Default options
+
+--- PAGE 10: SEARCH PAGE ---
+URL: /search?q=running
+
+- Search bar at top (pre-filled with query)
+- Results count: "24 results for 'running'"
+- Same filter sidebar as collection pages
+- Product grid with pagination
+- If no results: "No products found" with suggested categories
+
+--- PAGE 11: ADDITIONAL PAGES ---
+
+About Us (/about):
+- Brand story, vision, mission
+- Team section
+- "Why Nano Shoes" features: Quality, Comfort, Style, Value
+
+Contact Us (/contact):
+- Contact form: Name, Email, Subject, Message
+- Store info: Address, Phone, Email, Hours
+- Google Maps embed
+- Social media links
+
+Size Guide (/size-guide):
+- Men's, Women's, Kids' size charts
+- Foot measurement instructions
+- UK / EU / US size conversion table
+
+FAQs (/faqs):
+- Accordion style Q&A
+- Topics: Shipping, Returns, Payments, Sizing, Orders
+
+Track Order (/track-order):
+- Order number + email input
+- Shows order status timeline
+
+==============================================================
+SECTION 2 — ADMIN PANEL
+==============================================================
+
+URL: /admin (protected, admin login required)
+
+Admin Login Page:
+- Email + Password
+- "NANO SHOES ADMIN" branding
+- Secure login with JWT
+
+Admin Layout:
+- Left sidebar: logo at top, nav links, logout at bottom
+- Top bar: admin name, notification bell, quick links
+- Main content area (right side, full width)
+
+--- ADMIN PAGE 1: DASHBOARD ---
+URL: /admin/dashboard
+
+Stats Cards Row (4 cards):
+- Total Revenue: PKR 2,45,800 (this month) [green up arrow]
+- Total Orders: 124 (this month) [blue up arrow]
+- Total Products: 287 [gray]
+- Total Customers: 1,042 [purple up arrow]
+
+Revenue Chart:
+- Line chart showing monthly revenue (last 12 months)
+- Toggle: Revenue / Orders / Customers
+
+Recent Orders Table:
+- Order #, Customer, Date, Amount, Status, Action
+- Last 10 orders
+- "View All Orders" link
+
+Top Selling Products:
+- List of 5 best sellers with image, name, units sold, revenue
+
+Low Stock Alert:
+- Products with stock < 5 shown with warning badge
+
+--- ADMIN PAGE 2: PRODUCTS MANAGEMENT ---
+URL: /admin/products
+
+Products Table:
+- Columns: Image, Product Name, Category, Price, Stock, Status, Actions
+- Actions: Edit (pencil icon), Delete (trash icon)
+- Search bar above table
+- Filter by: Category, Status (Active/Draft)
+- Bulk select + bulk delete option
+- "ADD NEW PRODUCT" button (top right, black)
+
+Add/Edit Product Form (/admin/products/add):
+BASIC INFO:
+- Product Name (text input)
+- URL Slug (auto-generated, editable)
+- Description (rich text editor with bold, italic, lists)
+- Short Description (textarea, for product card)
+
+PRICING:
+- Regular Price (PKR)
+- Sale Price (PKR, optional)
+- Cost Price (for profit calculation, not shown to customers)
+
+CATEGORIZATION:
+- Main Category (dropdown): Men, Women, Kids
+- Sub Category (dropdown): Running, Casual, Formal, Sports, etc.
+- Tags (multi-input): running, lightweight, summer, etc.
+- Brand Line (dropdown): Nano Pro, Nano Air, Nano Flex, Nano Classic
+
+IMAGES:
+- Drag & drop image upload (max 6 images)
+- First image = main image
+- Reorder by dragging
+- Image preview with delete option
+
+VARIANTS:
+- Sizes (checkboxes): UK 6 | 7 | 8 | 9 | 10 | 11 | 12
+  (for women add: UK 3 | 4 | 5 | 6 | 7 | 8)
+- Colors: Add color (color picker + color name input)
+  Can add multiple colors
+
+INVENTORY:
+- Total Stock Quantity
+- Per-variant stock (optional: stock per size)
+- SKU Code
+- Barcode (optional)
+
+STATUS:
+- Toggle: Active (visible on store) / Draft (hidden)
+- Featured Product toggle (shows on homepage)
+- New Arrival badge toggle
+- Sale badge toggle
+
+Save as Draft button | Publish Product button
+
+--- ADMIN PAGE 3: ORDERS MANAGEMENT ---
+URL: /admin/orders
+
+Orders Table:
+- Columns: Order #, Customer Name, Date, Items Count, Total, 
+  Payment Method, Status, Actions
+- Status filter tabs: All | Pending | Processing | Shipped | 
+  Delivered | Cancelled
+- Date range filter
+- Search by order # or customer name
+- Export to CSV button
+
+Order Detail Page (/admin/orders/:id):
+- Order # and date
+- Customer info (name, email, phone)
+- Shipping address
+- Items list (image, name, size, color, qty, price)
+- Payment method + payment status
+- Order timeline (Placed → Confirmed → Shipped → Delivered)
+- Update Status dropdown (with Save button)
+- Add tracking number input
+- Internal notes textarea (admin only)
+- Print Invoice button (opens print-friendly view)
+
+--- ADMIN PAGE 4: CUSTOMERS ---
+URL: /admin/customers
+
+Customers Table:
+- Columns: Avatar, Name, Email, Phone, Total Orders, 
+  Total Spent, Joined Date, Status, Actions
+- Search by name or email
+- Filter by: Active / Banned
+
+Customer Detail Page:
+- Profile info
+- Order history table
+- Total spent summary
+- Ban / Unban button with confirmation dialog
+
+--- ADMIN PAGE 5: CATEGORIES ---
+URL: /admin/categories
+
+Categories Table:
+- Columns: Image, Category Name, Slug, Products Count, Actions
+- Add New Category form:
+  * Name, Slug (auto-generated)
+  * Image upload
+  * Parent Category (for sub-categories)
+  * Status (Active/Hidden)
+- Edit + Delete inline
+
+--- ADMIN PAGE 6: COUPONS ---
+URL: /admin/coupons
+
+Coupons Table:
+- Columns: Code, Type, Value, Min Order, Expiry, Uses, Status, Actions
+- Add New Coupon:
+  * Coupon Code (text, e.g., NANO20)
+  * Discount Type: Percentage (%) or Fixed Amount (PKR)
+  * Discount Value
+  * Minimum Order Amount
+  * Maximum Uses (leave blank for unlimited)
+  * Expiry Date (date picker)
+  * Active / Inactive toggle
+- Edit + Delete + Active toggle per coupon
+
+--- ADMIN PAGE 7: SETTINGS ---
+URL: /admin/settings
+
+Store Settings:
+- Store Name: Nano Shoes
+- Store Tagline
+- Store Logo (image upload)
+- Favicon (image upload)
+- Store Email
+- Store Phone
+- Store Address
+
+Shipping Settings:
+- Free shipping threshold (PKR 3000)
+- Standard shipping rate (PKR 200)
+- Cities for same-day delivery
+
+Payment Methods:
+- Toggle on/off: COD, Credit Card, EasyPaisa, JazzCash
+
+Social Media Links:
+- Instagram URL
+- Facebook URL
+- TikTok URL
+- YouTube URL
+
+Admin Password Change:
+- Current Password, New Password, Confirm Password
+
+==============================================================
+SECTION 3 — TECH STACK
+==============================================================
+
+RECOMMENDED: MERN Stack
+
+Frontend (client/):
+- React.js 18 with React Router v6
+- Tailwind CSS for styling
+- Framer Motion for animations
+- Redux Toolkit for state (cart, wishlist, auth)
+- Axios for API calls
+- React Hot Toast for notifications
+- Swiper.js for sliders/carousels
+- React Icons for all icons
+
+Backend (server/):
+- Node.js + Express.js
+- MongoDB + Mongoose
+- JWT for authentication
+- Bcrypt for password hashing
+- Multer + Cloudinary for image uploads
+- Nodemailer for order confirmation emails
+- Express Validator for input validation
+- CORS configured for frontend URL
+
+==============================================================
+SECTION 4 — DATABASE MODELS
+==============================================================
+
+USER: { name, email, phone, password(hashed), role(user/admin), 
+  avatar, addresses[], wishlist[productIds], isActive, createdAt }
+
+PRODUCT: { name, slug, description, shortDescription, 
+  regularPrice, salePrice, costPrice, mainCategory, subCategory, 
+  brandLine, tags[], images[], sizes[], 
+  colors[{name, hex}], stock, sku, 
+  isFeatured, isNewArrival, isOnSale, status, 
+  ratings{average, count}, reviews[], createdAt }
+
+REVIEW: { product, user, rating(1-5), title, comment, 
+  isVerifiedPurchase, createdAt }
+
+ORDER: { orderNumber, user, items[{product, name, image, 
+  size, color, quantity, price}], shippingAddress, 
+  paymentMethod, paymentStatus, couponCode, discountAmount, 
+  subtotal, shippingCost, total, status, trackingNumber, 
+  notes, statusHistory[{status, timestamp}], createdAt }
+
+CATEGORY: { name, slug, image, parentCategory, 
+  description, isActive }
+
+COUPON: { code, discountType(percentage/fixed), discountValue, 
+  minimumOrderAmount, maximumUses, usedCount, 
+  expiryDate, isActive, createdAt }
+
+SETTINGS: { storeName, tagline, logo, favicon, email, phone, 
+  address, freeShippingThreshold, shippingRate, 
+  paymentMethods{}, socialLinks{}, updatedAt }
+
+==============================================================
+SECTION 5 — API ENDPOINTS
+==============================================================
+
+AUTH ROUTES:
+POST /api/auth/register
+POST /api/auth/login
+POST /api/auth/forgot-password
+PUT  /api/auth/reset-password
+
+PRODUCT ROUTES:
+GET    /api/products (with filters: category, size, color, 
+                      price, sort, page, limit)
+GET    /api/products/:slug
+GET    /api/products/featured
+GET    /api/products/new-arrivals
+GET    /api/products/search?q=query
+POST   /api/products (admin)
+PUT    /api/products/:id (admin)
+DELETE /api/products/:id (admin)
+
+CATEGORY ROUTES:
+GET    /api/categories
+POST   /api/categories (admin)
+PUT    /api/categories/:id (admin)
+DELETE /api/categories/:id (admin)
+
+ORDER ROUTES:
+POST   /api/orders (create new order)
+GET    /api/orders/my-orders (user's own orders)
+GET    /api/orders/:id
+GET    /api/orders (admin - all orders)
+PUT    /api/orders/:id/status (admin)
+
+USER ROUTES:
+GET    /api/users/profile
+PUT    /api/users/profile
+PUT    /api/users/change-password
+GET    /api/users/wishlist
+POST   /api/users/wishlist/:productId
+DELETE /api/users/wishlist/:productId
+GET    /api/users (admin - all users)
+PUT    /api/users/:id/ban (admin)
+
+COUPON ROUTES:
+POST   /api/coupons/validate (check coupon)
+GET    /api/coupons (admin)
+POST   /api/coupons (admin)
+PUT    /api/coupons/:id (admin)
+DELETE /api/coupons/:id (admin)
+
+SETTINGS ROUTES:
+GET    /api/settings
+PUT    /api/settings (admin)
+
+==============================================================
+SECTION 6 — EXTRA REQUIREMENTS
+==============================================================
+
+Performance:
+- Lazy load images (loading="lazy")
+- Code splitting with React.lazy()
+- Product images compressed before upload
+- API responses paginated
+
+Security:
+- JWT tokens expire in 7 days
+- Admin routes protected by middleware
+- Passwords hashed with bcrypt (salt rounds: 12)
+- Input sanitization on all forms
+- Rate limiting on auth routes
+
+UX Requirements:
+- Loading skeleton screens (not spinners) while data fetches
+- Empty states with helpful messages and CTAs
+- Form validation with inline error messages (red text below input)
+- Success toast: bottom-right, green, auto-dismiss 3s
+- Error toast: bottom-right, red, auto-dismiss 5s
+- Confirm dialogs before any delete action
+- Smooth page transitions
+
+Mobile Experience:
+- Touch-friendly: all buttons min 44px height
+- Swipeable product image gallery on mobile
+- Bottom navigation bar on mobile (Home, Shop, Cart, Account)
+- Cart sidebar slides in from right on desktop, 
+  full screen on mobile
+
+Sample Data:
+- Seed script with 30+ sample products across all categories
+- 5 sample categories (Men, Women, Kids, Running, Sale)
+- 3 coupon codes: NANO10 (10% off), NANO20 (20% off), 
+  WELCOME50 (PKR 50 off first order)
+- 1 admin user: admin@nanoshoes.com / Admin@123
+- 5 sample customer accounts
