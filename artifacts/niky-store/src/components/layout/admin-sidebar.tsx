@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { LayoutDashboard, ShoppingBag, ShoppingCart, Tags, LogOut } from "lucide-react";
+import { LayoutDashboard, ShoppingBag, ShoppingCart, Tags, Users, Ticket, Settings, LogOut } from "lucide-react";
 
 export function AdminSidebar() {
   const [location] = useLocation();
@@ -8,7 +8,10 @@ export function AdminSidebar() {
     { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
     { href: "/admin/products", label: "Products", icon: ShoppingBag },
     { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
+    { href: "/admin/customers", label: "Customers", icon: Users },
     { href: "/admin/categories", label: "Categories", icon: Tags },
+    { href: "/admin/coupons", label: "Coupons", icon: Ticket },
+    { href: "/admin/settings", label: "Settings", icon: Settings },
   ];
 
   return (
@@ -19,7 +22,7 @@ export function AdminSidebar() {
         </Link>
       </div>
 
-      <nav className="flex-1 py-6 px-4 space-y-2">
+      <nav className="flex-1 py-6 px-4 space-y-2 overflow-y-auto">
         {links.map((link) => {
           const isActive = link.exact ? location === link.href : location.startsWith(link.href);
           const Icon = link.icon;

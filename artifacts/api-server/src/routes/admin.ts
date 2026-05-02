@@ -45,18 +45,12 @@ router.get("/admin/stats", async (_req, res) => {
     .where(eq(ordersTable.status, "pending"));
 
   const statusRows = await db
-    .select({
-      status: ordersTable.status,
-      count: sql<number>`count(*)`,
-    })
+    .select({ status: ordersTable.status, count: sql<number>`count(*)` })
     .from(ordersTable)
     .groupBy(ordersTable.status);
 
-  // Unique customers (by email)
   const [customersRow] = await db
-    .select({
-      count: sql<number>`count(distinct ${ordersTable.customerEmail})`,
-    })
+    .select({ count: sql<number>`count(distinct ${ordersTable.customerEmail})` })
     .from(ordersTable);
 
   res.json({
@@ -67,10 +61,7 @@ router.get("/admin/stats", async (_req, res) => {
     totalProducts: Number(productsRow.count),
     totalCustomers: Number(customersRow.count),
     pendingOrders: Number(pendingRow.count),
-    ordersByStatus: statusRows.map((r) => ({
-      status: r.status,
-      count: Number(r.count),
-    })),
+    ordersByStatus: statusRows.map((r) => ({ status: r.status, count: Number(r.count) })),
   });
 });
 
@@ -78,13 +69,7 @@ router.get("/admin/stats", async (_req, res) => {
 router.get("/admin/recent-orders", async (req, res) => {
   const parsed = GetRecentOrdersQueryParams.safeParse(req.query);
   const limit = parsed.success ? (parsed.data.limit ?? 10) : 10;
-
-  const orders = await db
-    .select()
-    .from(ordersTable)
-    .orderBy(desc(ordersTable.createdAt))
-    .limit(limit);
-
+  const orders = await db.select().from(ordersTable).orderBy(desc(ordersTable.createdAt)).limit(limit);
   res.json(orders.map(mapOrder));
 });
 
@@ -92,23 +77,12 @@ router.get("/admin/recent-orders", async (req, res) => {
 router.get("/admin/top-products", async (req, res) => {
   const parsed = GetTopProductsQueryParams.safeParse(req.query);
   const limit = parsed.success ? (parsed.data.limit ?? 10) : 10;
-
-  const products = await db
-    .select()
-    .from(productsTable)
-    .orderBy(desc(productsTable.salesCount))
-    .limit(limit);
-
-  res.json(
-    products.map((p) => ({
-      id: p.id,
-      name: p.name,
-      imageUrl: p.imageUrl,
-      price: Number(p.price),
-      salesCount: p.salesCount,
-      revenue: Number(p.price) * p.salesCount,
-    }))
-  );
+  const products = await db.select().from(productsTable).orderBy(desc(productsTable.salesCount)).limit(limit);
+  res.json(products.map((p) => ({
+    id: p.id, name: p.name, imageUrl: p.imageUrl,
+    price: Number(p.price), salesCount: p.salesCount,
+    revenue: Number(p.price) * p.salesCount,
+  })));
 });
 
 // GET /api/admin/revenue-by-category
@@ -117,34 +91,58 @@ router.get("/admin/revenue-by-category", async (_req, res) => {
   const orders = await db.select().from(ordersTable).where(sql`${ordersTable.status} != 'cancelled'`);
 
   const revenueMap: Record<number, { revenue: number; orderCount: number }> = {};
-
   for (const order of orders) {
     for (const item of order.items as Array<{ productId: number; price: number; quantity: number }>) {
-      const product = await db
+      const [product] = await db
         .select({ categoryId: productsTable.categoryId })
         .from(productsTable)
         .where(eq(productsTable.id, item.productId))
         .limit(1);
-
-      if (product.length > 0) {
-        const catId = product[0].categoryId;
-        if (!revenueMap[catId]) {
-          revenueMap[catId] = { revenue: 0, orderCount: 0 };
-        }
+      if (product) {
+        const catId = product.categoryId;
+        if (!revenueMap[catId]) revenueMap[catId] = { revenue: 0, orderCount: 0 };
         revenueMap[catId].revenue += item.price * item.quantity;
         revenueMap[catId].orderCount += 1;
       }
     }
   }
 
-  res.json(
-    categories.map((cat) => ({
-      categoryId: cat.id,
-      categoryName: cat.name,
-      revenue: revenueMap[cat.id]?.revenue ?? 0,
-      orderCount: revenueMap[cat.id]?.orderCount ?? 0,
-    }))
-  );
+  res.json(categories.map((cat) => ({
+    categoryId: cat.id, categoryName: cat.name,
+    revenue: revenueMap[cat.id]?.revenue ?? 0,
+    orderCount: revenueMap[cat.id]?.orderCount ?? 0,
+  })));
+});
+
+// GET /api/admin/monthly-revenue
+router.get("/admin/monthly-revenue", async (_req, res) => {
+  const rows = await db
+    .select({
+      month: sql<string>`to_char(${ordersTable.createdAt}, 'YYYY-MM')`,
+      revenue: sql<number>`coalesce(sum(${ordersTable.total}), 0)`,
+      orders: sql<number>`count(*)`,
+    })
+    .from(ordersTable)
+    .where(sql`${ordersTable.status} != 'cancelled' AND ${ordersTable.createdAt} >= now() - interval '12 months'`)
+    .groupBy(sql`to_char(${ordersTable.createdAt}, 'YYYY-MM')`)
+    .orderBy(sql`to_char(${ordersTable.createdAt}, 'YYYY-MM')`);
+
+  // Fill in missing months
+  const monthMap: Record<string, { revenue: number; orders: number }> = {};
+  for (const r of rows) {
+    monthMap[r.month] = { revenue: Number(r.revenue), orders: Number(r.orders) };
+  }
+
+  const result = [];
+  const now = new Date();
+  for (let i = 11; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    const label = d.toLocaleString("default", { month: "short", year: "2-digit" });
+    result.push({ month: label, revenue: monthMap[key]?.revenue ?? 0, orders: monthMap[key]?.orders ?? 0 });
+  }
+
+  res.json(result);
 });
 
 export default router;

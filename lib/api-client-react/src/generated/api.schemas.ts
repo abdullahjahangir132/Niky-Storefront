@@ -9,6 +9,14 @@ export interface HealthStatus {
   status: string;
 }
 
+export interface AdminLoginBody {
+  password: string;
+}
+
+export interface AdminAuthStatus {
+  authenticated: boolean;
+}
+
 export interface Product {
   id: number;
   name: string;
@@ -141,6 +149,9 @@ export interface Order {
   city: string;
   country: string;
   status: OrderStatus;
+  paymentMethod?: string;
+  couponCode?: string;
+  discount?: number;
   items: OrderItem[];
   subtotal: number;
   shippingCost: number;
@@ -163,6 +174,8 @@ export interface CreateOrderBody {
   shippingAddress: string;
   city: string;
   country: string;
+  paymentMethod?: string;
+  couponCode?: string;
 }
 
 export type UpdateOrderStatusBodyStatus =
@@ -212,6 +225,98 @@ export interface CategoryRevenue {
   orderCount: number;
 }
 
+export interface MonthlyRevenue {
+  month: string;
+  revenue: number;
+  orders: number;
+}
+
+export interface Customer {
+  email: string;
+  name: string;
+  phone?: string;
+  totalOrders: number;
+  totalSpent: number;
+  lastOrderAt?: string;
+  joinedAt: string;
+}
+
+export interface CustomerListResponse {
+  customers: Customer[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+export interface CustomerDetail {
+  email: string;
+  name: string;
+  phone?: string;
+  totalOrders: number;
+  totalSpent: number;
+  joinedAt: string;
+  orders: Order[];
+}
+
+export interface Coupon {
+  id: number;
+  code: string;
+  discountType: string;
+  discountAmount: number;
+  minOrderAmount: number;
+  maxUses?: number | null;
+  usedCount: number;
+  expiresAt?: string | null;
+  isActive: boolean;
+  createdAt: string;
+}
+
+export interface CreateCouponBody {
+  code: string;
+  discountType: string;
+  discountAmount: number;
+  minOrderAmount?: number;
+  maxUses?: number | null;
+  expiresAt?: string | null;
+  isActive?: boolean;
+}
+
+export interface UpdateCouponBody {
+  code?: string;
+  discountType?: string;
+  discountAmount?: number;
+  minOrderAmount?: number;
+  maxUses?: number | null;
+  expiresAt?: string | null;
+  isActive?: boolean;
+}
+
+export interface ValidateCouponBody {
+  code: string;
+  orderTotal: number;
+}
+
+export interface CouponValidationResult {
+  valid: boolean;
+  discountAmount: number;
+  message: string;
+  coupon?: Coupon | null;
+}
+
+export interface StoreSettings {
+  storeName?: string;
+  logoUrl?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  address?: string;
+  facebookUrl?: string;
+  instagramUrl?: string;
+  twitterUrl?: string;
+  shippingRate?: number;
+  freeShippingThreshold?: number;
+  currency?: string;
+}
+
 export type ListProductsParams = {
   category?: string;
   search?: string;
@@ -259,4 +364,10 @@ export type GetRecentOrdersParams = {
 
 export type GetTopProductsParams = {
   limit?: number;
+};
+
+export type ListCustomersParams = {
+  search?: string;
+  limit?: number;
+  offset?: number;
 };

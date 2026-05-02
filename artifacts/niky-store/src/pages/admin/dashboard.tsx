@@ -1,17 +1,17 @@
 import { AdminLayout } from "@/components/layout/admin-layout";
-import { useGetAdminStats, useGetRecentOrders, useGetTopProducts, useGetRevenueByCategory } from "@workspace/api-client-react";
+import { useGetAdminStats, useGetRecentOrders, useGetTopProducts, useGetMonthlyRevenue } from "@workspace/api-client-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DollarSign, ShoppingBag, ShoppingCart, Users, ArrowUpRight, ArrowDownRight } from "lucide-react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
 import { Link } from "wouter";
 
 export default function AdminDashboard() {
   const { data: stats, isLoading: statsLoading } = useGetAdminStats();
   const { data: recentOrders, isLoading: ordersLoading } = useGetRecentOrders({ limit: 5 });
   const { data: topProducts, isLoading: productsLoading } = useGetTopProducts({ limit: 4 });
-  const { data: categoryRevenue, isLoading: categoriesLoading } = useGetRevenueByCategory();
+  const { data: monthlyRevenue, isLoading: monthlyLoading } = useGetMonthlyRevenue();
 
-  if (statsLoading || ordersLoading || productsLoading || categoriesLoading) {
+  if (statsLoading || ordersLoading || productsLoading || monthlyLoading) {
     return <AdminLayout><div className="p-8 text-center text-muted-foreground">Loading dashboard data...</div></AdminLayout>;
   }
 
@@ -54,27 +54,28 @@ export default function AdminDashboard() {
         {/* Revenue Chart */}
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle className="font-display uppercase tracking-wider">Revenue by Category</CardTitle>
+            <CardTitle className="font-display uppercase tracking-wider">Monthly Revenue (Last 12 Months)</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="h-[300px] w-full">
-              {categoryRevenue && categoryRevenue.length > 0 ? (
+              {monthlyRevenue && monthlyRevenue.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={categoryRevenue} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                  <LineChart data={monthlyRevenue} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
-                    <XAxis dataKey="categoryName" axisLine={false} tickLine={false} />
-                    <YAxis axisLine={false} tickLine={false} tickFormatter={(value) => `$${value}`} />
+                    <XAxis dataKey="month" axisLine={false} tickLine={false} />
+                    <YAxis yAxisId="left" axisLine={false} tickLine={false} tickFormatter={(value) => `$${value}`} />
+                    <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} />
                     <Tooltip 
-                      cursor={{ fill: 'transparent' }}
                       contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                      formatter={(value: number) => [`$${value}`, 'Revenue']}
+                      formatter={(value: number, name: string) => [
+                        name === 'revenue' ? `$${value}` : value, 
+                        name === 'revenue' ? 'Revenue' : 'Orders'
+                      ]}
                     />
-                    <Bar dataKey="revenue" radius={[4, 4, 0, 0]}>
-                      {categoryRevenue.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={index === 0 ? 'hsl(var(--accent))' : 'hsl(var(--primary))'} />
-                      ))}
-                    </Bar>
-                  </BarChart>
+                    <Legend />
+                    <Line yAxisId="left" type="monotone" dataKey="revenue" stroke="#C8102E" strokeWidth={3} dot={{ r: 4 }} activeDot={{ r: 6 }} name="revenue" />
+                    <Line yAxisId="right" type="monotone" dataKey="orders" stroke="#9ca3af" strokeWidth={2} dot={{ r: 3 }} name="orders" />
+                  </LineChart>
                 </ResponsiveContainer>
               ) : (
                 <div className="h-full flex items-center justify-center text-muted-foreground">
