@@ -1,0 +1,64 @@
+Build the following pages for the NIKY store:
+
+1. HOME PAGE
+   - Full-screen hero banner with large background image/video, bold headline 
+     ("Just Do It" style), and CTA button ("Shop Now")
+   - Featured collections section (Men, Women, Kids)
+   - New Arrivals section (horizontal scroll or grid of product cards)
+   - Sale/Promo banner (like Nike's promotional strips)
+   - Brand story section
+   - Newsletter signup section
+   - Footer with links, social icons, logo
+
+2. PRODUCTS PAGE (Shop/Collection)
+   - Grid layout of shoes
+   - Filter sidebar: Category, Size, Color, Price Range, Brand
+   - Sort by: Price, Newest, Popular
+   - Product card: Image, Name, Price, Add to Cart button, Wishlist icon
+   - Pagination or infinite scroll
+
+3. PRODUCT DETAIL PAGE
+   - Large product images with thumbnail gallery / image zoom
+   - Product name, price, description
+   - Size selector (UK 6, 7, 8, 9, 10, 11)
+   - Color selector
+   - Quantity selector
+   - Add to Cart + Buy Now buttons
+   - Product details accordion (Material, Care, Shipping)
+   - Related Products section
+
+4. CART PAGE
+   - List of added items with image, name, size, color, quantity, price
+   - Update quantity / Remove item
+   - Order summary with subtotal, shipping, discount, total
+   - Coupon code input
+   - Proceed to Checkout button
+
+5. CHECKOUT PAGE
+   - Shipping address form (Name, Email, Phone, Address, City, Country)
+   - Payment method selector (Cash on Delivery, Credit Card, etc.)
+   - Order summary sidebar
+   - Place Order button
+
+6. USER AUTHENTICATION
+   - Login Page (Email + Password)
+   - Register Page (Name, Email, Password)
+   - Forgot Password page
+   - User stays logged in (JWT or session-based auth)
+
+7. USER ACCOUNT PAGE (after login)
+   - My Orders (list of past orders with status)
+   - My Profile (edit name, email, password)
+   - My Wishlist
+   - Saved Addresses
+
+8. SEARCH
+   - Search bar in navbar with live/instant search suggestions
+   - Search results page with filters
+
+9. ABOUT US PAGE
+   - Brand story, mission, team section
+
+10. CONTACT US PAGE
+    - Contact form (Name, Email, Message)
+    - Store address, phone, email, Google Map embed
