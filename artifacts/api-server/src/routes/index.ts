@@ -6,14 +6,18 @@ import cartRouter from "./cart";
 import ordersRouter from "./orders";
 import adminRouter from "./admin";
 import authRouter from "./auth";
+import userAuthRouter from "./user-auth";
 import customersRouter from "./customers";
 import couponsRouter from "./coupons";
 import settingsRouter from "./settings";
+import wishlistsRouter from "./wishlists";
+import reviewsRouter from "./reviews";
 
 const router: IRouter = Router();
 
 router.use(healthRouter);
 router.use(authRouter);
+router.use(userAuthRouter);
 router.use(productsRouter);
 router.use(categoriesRouter);
 router.use(cartRouter);
@@ -22,5 +26,7 @@ router.use(adminRouter);
 router.use(customersRouter);
 router.use(couponsRouter);
 router.use(settingsRouter);
+router.use(wishlistsRouter);
+router.use(reviewsRouter);
 
 export default router;

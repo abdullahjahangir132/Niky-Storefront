@@ -1,12 +1,10 @@
 import { useState, useEffect } from "react";
-import { AdminLayout } from "@/components/layout/admin-layout";
 import { useGetSettings, useUpdateSettings, getGetSettingsQueryKey } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { Save } from "lucide-react";
@@ -14,93 +12,44 @@ import { Save } from "lucide-react";
 export default function AdminSettings() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
   const { data: settings, isLoading } = useGetSettings();
-  
+
   const updateSettings = useUpdateSettings({
     mutation: {
       onSuccess: () => {
-        toast({ title: "Settings saved successfully" });
+        toast({ title: "Settings saved" });
         queryClient.invalidateQueries({ queryKey: getGetSettingsQueryKey() });
       },
-      onError: (err: any) => {
-        toast({ title: err.message || "Error saving settings", variant: "destructive" });
-      }
-    }
+      onError: (err: any) => toast({ title: err.message || "Error saving settings", variant: "destructive" }),
+    },
   });
 
-  // Local state for forms
-  const [storeInfo, setStoreInfo] = useState({
-    storeName: "",
-    logoUrl: "",
-    contactEmail: "",
-    contactPhone: "",
-    address: ""
-  });
-  
-  const [socialMedia, setSocialMedia] = useState({
-    facebookUrl: "",
-    instagramUrl: "",
-    twitterUrl: ""
-  });
-  
-  const [shipping, setShipping] = useState({
-    shippingRate: "0",
-    freeShippingThreshold: "0",
-    currency: "USD"
-  });
-
-  // Password state
-  const [passwordState, setPasswordState] = useState({
-    oldPassword: "",
-    newPassword: "",
-    confirmPassword: ""
-  });
+  const [storeInfo, setStoreInfo] = useState({ storeName: "", logoUrl: "", contactEmail: "", contactPhone: "", address: "" });
+  const [socialMedia, setSocialMedia] = useState({ facebookUrl: "", instagramUrl: "", tiktokUrl: "" });
+  const [shipping, setShipping] = useState({ shippingRate: "200", freeShippingThreshold: "3000", currency: "PKR" });
+  const [passwordState, setPasswordState] = useState({ oldPassword: "", newPassword: "", confirmPassword: "" });
 
   useEffect(() => {
     if (settings) {
       setStoreInfo({
-        storeName: settings.storeName || "",
+        storeName: settings.storeName || "NANO SHOES",
         logoUrl: settings.logoUrl || "",
         contactEmail: settings.contactEmail || "",
         contactPhone: settings.contactPhone || "",
-        address: settings.address || ""
+        address: settings.address || "",
       });
-      
       setSocialMedia({
         facebookUrl: settings.facebookUrl || "",
         instagramUrl: settings.instagramUrl || "",
-        twitterUrl: settings.twitterUrl || ""
+        tiktokUrl: settings.tiktokUrl || "",
       });
-      
       setShipping({
-        shippingRate: settings.shippingRate?.toString() || "0",
-        freeShippingThreshold: settings.freeShippingThreshold?.toString() || "0",
-        currency: settings.currency || "USD"
+        shippingRate: settings.shippingRate?.toString() || "200",
+        freeShippingThreshold: settings.freeShippingThreshold?.toString() || "3000",
+        currency: settings.currency || "PKR",
       });
     }
   }, [settings]);
-
-  const handleSaveStoreInfo = (e: React.FormEvent) => {
-    e.preventDefault();
-    updateSettings.mutate({ data: storeInfo });
-  };
-
-  const handleSaveSocialMedia = (e: React.FormEvent) => {
-    e.preventDefault();
-    updateSettings.mutate({ data: socialMedia });
-  };
-
-  const handleSaveShipping = (e: React.FormEvent) => {
-    e.preventDefault();
-    updateSettings.mutate({ 
-      data: { 
-        shippingRate: Number(shipping.shippingRate),
-        freeShippingThreshold: Number(shipping.freeShippingThreshold),
-        currency: shipping.currency
-      } 
-    });
-  };
 
   const handlePasswordChange = (e: React.FormEvent) => {
     e.preventDefault();
@@ -108,58 +57,63 @@ export default function AdminSettings() {
       toast({ title: "Passwords do not match", variant: "destructive" });
       return;
     }
-    toast({ title: "Feature coming soon", description: "Password change will be implemented in the next update." });
+    toast({ title: "Password change coming soon" });
     setPasswordState({ oldPassword: "", newPassword: "", confirmPassword: "" });
   };
 
   if (isLoading) {
-    return <AdminLayout><div className="p-8 text-center text-muted-foreground">Loading settings...</div></AdminLayout>;
+    return (
+      <div className="space-y-4 animate-pulse">
+        <div className="h-10 bg-secondary rounded w-1/3" />
+        <div className="h-64 bg-secondary rounded-2xl" />
+      </div>
+    );
   }
 
   return (
-    <AdminLayout>
+    <div>
       <div className="mb-8">
         <h1 className="font-display font-bold text-4xl uppercase tracking-tight">Settings</h1>
         <p className="text-muted-foreground mt-1">Configure your store preferences</p>
       </div>
 
-      <div className="grid gap-8 max-w-4xl">
-        <Tabs defaultValue="store-info" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-8 h-12 bg-secondary rounded-lg">
-            <TabsTrigger value="store-info" className="font-display uppercase tracking-wider h-full data-[state=active]:bg-background">Store Info</TabsTrigger>
-            <TabsTrigger value="social" className="font-display uppercase tracking-wider h-full data-[state=active]:bg-background">Social Media</TabsTrigger>
-            <TabsTrigger value="shipping" className="font-display uppercase tracking-wider h-full data-[state=active]:bg-background">Shipping & Payments</TabsTrigger>
+      <div className="max-w-3xl space-y-8">
+        <Tabs defaultValue="store-info">
+          <TabsList className="grid w-full grid-cols-3 mb-6 h-11">
+            <TabsTrigger value="store-info" className="font-display uppercase tracking-wider text-xs">Store Info</TabsTrigger>
+            <TabsTrigger value="social" className="font-display uppercase tracking-wider text-xs">Social Media</TabsTrigger>
+            <TabsTrigger value="shipping" className="font-display uppercase tracking-wider text-xs">Shipping</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="store-info">
             <Card>
-              <form onSubmit={handleSaveStoreInfo}>
+              <form onSubmit={(e) => { e.preventDefault(); updateSettings.mutate({ data: storeInfo }); }}>
                 <CardHeader>
-                  <CardTitle className="font-display uppercase tracking-wider text-xl">General Information</CardTitle>
-                  <CardDescription>Basic details about your brand and business.</CardDescription>
+                  <CardTitle className="font-display uppercase tracking-wider text-lg">General Information</CardTitle>
+                  <CardDescription>Brand name, logo, and contact details.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="storeName">Store Name</Label>
-                    <Input id="storeName" value={storeInfo.storeName} onChange={(e) => setStoreInfo({...storeInfo, storeName: e.target.value})} />
+                    <Label>Store Name</Label>
+                    <Input value={storeInfo.storeName} onChange={(e) => setStoreInfo({ ...storeInfo, storeName: e.target.value })} />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="logoUrl">Logo URL</Label>
-                    <Input id="logoUrl" value={storeInfo.logoUrl} onChange={(e) => setStoreInfo({...storeInfo, logoUrl: e.target.value})} placeholder="https://example.com/logo.png" />
+                    <Label>Logo URL</Label>
+                    <Input value={storeInfo.logoUrl} onChange={(e) => setStoreInfo({ ...storeInfo, logoUrl: e.target.value })} placeholder="https://..." />
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="contactEmail">Contact Email</Label>
-                      <Input id="contactEmail" type="email" value={storeInfo.contactEmail} onChange={(e) => setStoreInfo({...storeInfo, contactEmail: e.target.value})} />
+                      <Label>Contact Email</Label>
+                      <Input type="email" value={storeInfo.contactEmail} onChange={(e) => setStoreInfo({ ...storeInfo, contactEmail: e.target.value })} />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="contactPhone">Contact Phone</Label>
-                      <Input id="contactPhone" value={storeInfo.contactPhone} onChange={(e) => setStoreInfo({...storeInfo, contactPhone: e.target.value})} />
+                      <Label>Contact Phone</Label>
+                      <Input value={storeInfo.contactPhone} onChange={(e) => setStoreInfo({ ...storeInfo, contactPhone: e.target.value })} placeholder="+92 300 0000000" />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="address">Physical Address</Label>
-                    <Input id="address" value={storeInfo.address} onChange={(e) => setStoreInfo({...storeInfo, address: e.target.value})} />
+                    <Label>Address</Label>
+                    <Input value={storeInfo.address} onChange={(e) => setStoreInfo({ ...storeInfo, address: e.target.value })} placeholder="Lahore, Pakistan" />
                   </div>
                 </CardContent>
                 <CardFooter className="border-t px-6 py-4">
@@ -170,26 +124,26 @@ export default function AdminSettings() {
               </form>
             </Card>
           </TabsContent>
-          
+
           <TabsContent value="social">
             <Card>
-              <form onSubmit={handleSaveSocialMedia}>
+              <form onSubmit={(e) => { e.preventDefault(); updateSettings.mutate({ data: socialMedia }); }}>
                 <CardHeader>
-                  <CardTitle className="font-display uppercase tracking-wider text-xl">Social Media Links</CardTitle>
-                  <CardDescription>Connect your social profiles to the storefront footer.</CardDescription>
+                  <CardTitle className="font-display uppercase tracking-wider text-lg">Social Media</CardTitle>
+                  <CardDescription>Links shown in the storefront footer.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="instagramUrl">Instagram URL</Label>
-                    <Input id="instagramUrl" value={socialMedia.instagramUrl} onChange={(e) => setSocialMedia({...socialMedia, instagramUrl: e.target.value})} placeholder="https://instagram.com/niky" />
+                    <Label>Instagram</Label>
+                    <Input value={socialMedia.instagramUrl} onChange={(e) => setSocialMedia({ ...socialMedia, instagramUrl: e.target.value })} placeholder="https://instagram.com/nanoshoes.pk" />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="facebookUrl">Facebook URL</Label>
-                    <Input id="facebookUrl" value={socialMedia.facebookUrl} onChange={(e) => setSocialMedia({...socialMedia, facebookUrl: e.target.value})} placeholder="https://facebook.com/niky" />
+                    <Label>Facebook</Label>
+                    <Input value={socialMedia.facebookUrl} onChange={(e) => setSocialMedia({ ...socialMedia, facebookUrl: e.target.value })} placeholder="https://facebook.com/nanoshoes.pk" />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="twitterUrl">X (Twitter) URL</Label>
-                    <Input id="twitterUrl" value={socialMedia.twitterUrl} onChange={(e) => setSocialMedia({...socialMedia, twitterUrl: e.target.value})} placeholder="https://twitter.com/niky" />
+                    <Label>TikTok</Label>
+                    <Input value={socialMedia.tiktokUrl} onChange={(e) => setSocialMedia({ ...socialMedia, tiktokUrl: e.target.value })} placeholder="https://tiktok.com/@nanoshoes.pk" />
                   </div>
                 </CardContent>
                 <CardFooter className="border-t px-6 py-4">
@@ -200,44 +154,33 @@ export default function AdminSettings() {
               </form>
             </Card>
           </TabsContent>
-          
+
           <TabsContent value="shipping">
             <Card>
-              <form onSubmit={handleSaveShipping}>
+              <form onSubmit={(e) => { e.preventDefault(); updateSettings.mutate({ data: { shippingRate: Number(shipping.shippingRate), freeShippingThreshold: Number(shipping.freeShippingThreshold), currency: "PKR" } }); }}>
                 <CardHeader>
-                  <CardTitle className="font-display uppercase tracking-wider text-xl">Shipping & Payments</CardTitle>
-                  <CardDescription>Configure base rates and currency display.</CardDescription>
+                  <CardTitle className="font-display uppercase tracking-wider text-lg">Shipping & Payments</CardTitle>
+                  <CardDescription>Pakistan delivery rates in PKR.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="shippingRate">Flat Shipping Rate</Label>
+                      <Label>Standard Shipping Rate (PKR)</Label>
                       <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground">$</div>
-                        <Input id="shippingRate" type="number" min="0" step="0.01" className="pl-7" value={shipping.shippingRate} onChange={(e) => setShipping({...shipping, shippingRate: e.target.value})} />
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">PKR</span>
+                        <Input type="number" min="0" className="pl-12" value={shipping.shippingRate} onChange={(e) => setShipping({ ...shipping, shippingRate: e.target.value })} />
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="freeShippingThreshold">Free Shipping Threshold</Label>
+                      <Label>Free Shipping Threshold (PKR)</Label>
                       <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground">$</div>
-                        <Input id="freeShippingThreshold" type="number" min="0" step="0.01" className="pl-7" value={shipping.freeShippingThreshold} onChange={(e) => setShipping({...shipping, freeShippingThreshold: e.target.value})} />
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">PKR</span>
+                        <Input type="number" min="0" className="pl-12" value={shipping.freeShippingThreshold} onChange={(e) => setShipping({ ...shipping, freeShippingThreshold: e.target.value })} />
                       </div>
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="currency">Store Currency</Label>
-                    <Select value={shipping.currency} onValueChange={(val) => setShipping({...shipping, currency: val})}>
-                      <SelectTrigger id="currency">
-                        <SelectValue placeholder="Select currency" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="USD">USD ($) - US Dollar</SelectItem>
-                        <SelectItem value="EUR">EUR (€) - Euro</SelectItem>
-                        <SelectItem value="GBP">GBP (£) - British Pound</SelectItem>
-                        <SelectItem value="AED">AED (د.إ) - UAE Dirham</SelectItem>
-                      </SelectContent>
-                    </Select>
+                  <div className="p-4 bg-accent/5 border border-accent/20 rounded-xl text-sm text-muted-foreground">
+                    Currency is fixed to <span className="font-bold text-foreground">PKR (Pakistani Rupee)</span> for this store.
                   </div>
                 </CardContent>
                 <CardFooter className="border-t px-6 py-4">
@@ -250,37 +193,35 @@ export default function AdminSettings() {
           </TabsContent>
         </Tabs>
 
-        {/* Security Section */}
-        <Card className="border-red-900/20 bg-red-50/10">
+        {/* Security */}
+        <Card className="border-destructive/20">
           <form onSubmit={handlePasswordChange}>
             <CardHeader>
-              <CardTitle className="font-display uppercase tracking-wider text-xl text-accent">Security</CardTitle>
-              <CardDescription>Change admin panel access password.</CardDescription>
+              <CardTitle className="font-display uppercase tracking-wider text-lg text-destructive">Security</CardTitle>
+              <CardDescription>Change your admin panel access key.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="oldPassword">Current Password</Label>
-                <Input id="oldPassword" type="password" value={passwordState.oldPassword} onChange={(e) => setPasswordState({...passwordState, oldPassword: e.target.value})} required />
+                <Label>Current Password</Label>
+                <Input type="password" value={passwordState.oldPassword} onChange={(e) => setPasswordState({ ...passwordState, oldPassword: e.target.value })} required />
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="newPassword">New Password</Label>
-                  <Input id="newPassword" type="password" value={passwordState.newPassword} onChange={(e) => setPasswordState({...passwordState, newPassword: e.target.value})} required />
+                  <Label>New Password</Label>
+                  <Input type="password" value={passwordState.newPassword} onChange={(e) => setPasswordState({ ...passwordState, newPassword: e.target.value })} required />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirm New Password</Label>
-                  <Input id="confirmPassword" type="password" value={passwordState.confirmPassword} onChange={(e) => setPasswordState({...passwordState, confirmPassword: e.target.value})} required />
+                  <Label>Confirm Password</Label>
+                  <Input type="password" value={passwordState.confirmPassword} onChange={(e) => setPasswordState({ ...passwordState, confirmPassword: e.target.value })} required />
                 </div>
               </div>
             </CardContent>
             <CardFooter className="px-6 py-4">
-              <Button type="submit" variant="destructive" className="font-display uppercase tracking-wider">
-                Change Password
-              </Button>
+              <Button type="submit" variant="destructive" className="font-display uppercase tracking-wider">Change Password</Button>
             </CardFooter>
           </form>
         </Card>
       </div>
-    </AdminLayout>
+    </div>
   );
 }

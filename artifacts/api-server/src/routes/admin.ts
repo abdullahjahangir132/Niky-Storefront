@@ -1,25 +1,34 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
-import { ordersTable, productsTable, categoriesTable } from "@workspace/db";
-import { eq, sql, desc } from "drizzle-orm";
-import { GetRecentOrdersQueryParams, GetTopProductsQueryParams } from "@workspace/api-zod";
+import { ordersTable, productsTable } from "@workspace/db";
+import { eq, sql, desc, lte } from "drizzle-orm";
 
 const router = Router();
 
 function mapOrder(o: typeof ordersTable.$inferSelect) {
   return {
     id: o.id,
+    orderNumber: o.orderNumber,
     customerName: o.customerName,
     customerEmail: o.customerEmail,
     customerPhone: o.customerPhone,
     shippingAddress: o.shippingAddress,
+    addressLine2: o.addressLine2,
     city: o.city,
+    province: o.province,
+    postalCode: o.postalCode,
     country: o.country,
     status: o.status,
+    paymentMethod: o.paymentMethod,
+    paymentStatus: o.paymentStatus,
+    couponCode: o.couponCode ?? null,
+    discountAmount: Number(o.discountAmount),
     items: o.items,
     subtotal: Number(o.subtotal),
     shippingCost: Number(o.shippingCost),
     total: Number(o.total),
+    trackingNumber: o.trackingNumber ?? null,
+    notes: o.notes ?? null,
     createdAt: o.createdAt.toISOString(),
   };
 }
@@ -31,86 +40,49 @@ router.get("/admin/stats", async (_req, res) => {
     .from(ordersTable)
     .where(sql`${ordersTable.status} != 'cancelled'`);
 
-  const [ordersRow] = await db
-    .select({ count: sql<number>`count(*)` })
-    .from(ordersTable);
+  const [ordersRow] = await db.select({ count: sql<number>`count(*)` }).from(ordersTable);
+  const [productsRow] = await db.select({ count: sql<number>`count(*)` }).from(productsTable);
+  const [customersRow] = await db.select({ count: sql<number>`count(distinct ${ordersTable.customerEmail})` }).from(ordersTable);
 
-  const [productsRow] = await db
-    .select({ count: sql<number>`count(*)` })
-    .from(productsTable);
-
-  const [pendingRow] = await db
-    .select({ count: sql<number>`count(*)` })
+  // Compare this month vs last month
+  const [thisMonth] = await db
+    .select({ total: sql<number>`coalesce(sum(${ordersTable.total}), 0)`, count: sql<number>`count(*)` })
     .from(ordersTable)
-    .where(eq(ordersTable.status, "pending"));
+    .where(sql`"orders"."created_at" >= date_trunc('month', now()) AND "orders"."status" != 'cancelled'`);
 
-  const statusRows = await db
-    .select({ status: ordersTable.status, count: sql<number>`count(*)` })
+  const [lastMonth] = await db
+    .select({ total: sql<number>`coalesce(sum(${ordersTable.total}), 0)`, count: sql<number>`count(*)` })
     .from(ordersTable)
-    .groupBy(ordersTable.status);
+    .where(sql`"orders"."created_at" >= date_trunc('month', now() - interval '1 month') AND "orders"."created_at" < date_trunc('month', now()) AND "orders"."status" != 'cancelled'`);
 
-  const [customersRow] = await db
-    .select({ count: sql<number>`count(distinct ${ordersTable.customerEmail})` })
-    .from(ordersTable);
+  const revenueChange = lastMonth.total > 0 ? ((Number(thisMonth.total) - Number(lastMonth.total)) / Number(lastMonth.total)) * 100 : 0;
+  const ordersChange = lastMonth.count > 0 ? ((Number(thisMonth.count) - Number(lastMonth.count)) / Number(lastMonth.count)) * 100 : 0;
 
   res.json({
     totalRevenue: Number(revenueRow.total),
-    revenueChange: 12.5,
+    revenueChange: Math.round(revenueChange * 10) / 10,
     totalOrders: Number(ordersRow.count),
-    ordersChange: 8.3,
+    ordersChange: Math.round(ordersChange * 10) / 10,
     totalProducts: Number(productsRow.count),
     totalCustomers: Number(customersRow.count),
-    pendingOrders: Number(pendingRow.count),
-    ordersByStatus: statusRows.map((r) => ({ status: r.status, count: Number(r.count) })),
   });
 });
 
 // GET /api/admin/recent-orders
 router.get("/admin/recent-orders", async (req, res) => {
-  const parsed = GetRecentOrdersQueryParams.safeParse(req.query);
-  const limit = parsed.success ? (parsed.data.limit ?? 10) : 10;
+  const limit = parseInt(req.query.limit as string || "10") || 10;
   const orders = await db.select().from(ordersTable).orderBy(desc(ordersTable.createdAt)).limit(limit);
   res.json(orders.map(mapOrder));
 });
 
 // GET /api/admin/top-products
 router.get("/admin/top-products", async (req, res) => {
-  const parsed = GetTopProductsQueryParams.safeParse(req.query);
-  const limit = parsed.success ? (parsed.data.limit ?? 10) : 10;
+  const limit = parseInt(req.query.limit as string || "5") || 5;
   const products = await db.select().from(productsTable).orderBy(desc(productsTable.salesCount)).limit(limit);
-  res.json(products.map((p) => ({
+  res.json(products.map(p => ({
     id: p.id, name: p.name, imageUrl: p.imageUrl,
     price: Number(p.price), salesCount: p.salesCount,
     revenue: Number(p.price) * p.salesCount,
-  })));
-});
-
-// GET /api/admin/revenue-by-category
-router.get("/admin/revenue-by-category", async (_req, res) => {
-  const categories = await db.select().from(categoriesTable);
-  const orders = await db.select().from(ordersTable).where(sql`${ordersTable.status} != 'cancelled'`);
-
-  const revenueMap: Record<number, { revenue: number; orderCount: number }> = {};
-  for (const order of orders) {
-    for (const item of order.items as Array<{ productId: number; price: number; quantity: number }>) {
-      const [product] = await db
-        .select({ categoryId: productsTable.categoryId })
-        .from(productsTable)
-        .where(eq(productsTable.id, item.productId))
-        .limit(1);
-      if (product) {
-        const catId = product.categoryId;
-        if (!revenueMap[catId]) revenueMap[catId] = { revenue: 0, orderCount: 0 };
-        revenueMap[catId].revenue += item.price * item.quantity;
-        revenueMap[catId].orderCount += 1;
-      }
-    }
-  }
-
-  res.json(categories.map((cat) => ({
-    categoryId: cat.id, categoryName: cat.name,
-    revenue: revenueMap[cat.id]?.revenue ?? 0,
-    orderCount: revenueMap[cat.id]?.orderCount ?? 0,
   })));
 });
 
@@ -127,11 +99,8 @@ router.get("/admin/monthly-revenue", async (_req, res) => {
     .groupBy(sql`to_char(${ordersTable.createdAt}, 'YYYY-MM')`)
     .orderBy(sql`to_char(${ordersTable.createdAt}, 'YYYY-MM')`);
 
-  // Fill in missing months
   const monthMap: Record<string, { revenue: number; orders: number }> = {};
-  for (const r of rows) {
-    monthMap[r.month] = { revenue: Number(r.revenue), orders: Number(r.orders) };
-  }
+  for (const r of rows) monthMap[r.month] = { revenue: Number(r.revenue), orders: Number(r.orders) };
 
   const result = [];
   const now = new Date();
@@ -141,8 +110,18 @@ router.get("/admin/monthly-revenue", async (_req, res) => {
     const label = d.toLocaleString("default", { month: "short", year: "2-digit" });
     result.push({ month: label, revenue: monthMap[key]?.revenue ?? 0, orders: monthMap[key]?.orders ?? 0 });
   }
-
   res.json(result);
+});
+
+// GET /api/admin/low-stock
+router.get("/admin/low-stock", async (req, res) => {
+  const threshold = parseInt(req.query.threshold as string || "5") || 5;
+  const products = await db.select().from(productsTable).where(lte(productsTable.stock, threshold)).orderBy(productsTable.stock);
+  res.json(products.map(p => ({
+    id: p.id, name: p.name, imageUrl: p.imageUrl, stock: p.stock,
+    price: Number(p.price), sku: p.sku, status: p.status,
+    mainCategory: p.mainCategory, subCategory: p.subCategory,
+  })));
 });
 
 export default router;

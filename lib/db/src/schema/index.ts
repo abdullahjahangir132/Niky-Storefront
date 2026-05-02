@@ -4,3 +4,6 @@ export * from "./cart";
 export * from "./orders";
 export * from "./coupons";
 export * from "./settings";
+export * from "./users";
+export * from "./wishlists";
+export * from "./reviews";

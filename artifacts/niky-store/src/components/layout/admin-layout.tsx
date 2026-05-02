@@ -3,7 +3,7 @@ import { Menu, UserCircle, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAdminAuth } from "@/hooks/use-admin-auth";
 
-export function AdminLayout({ children }: { children: React.ReactNode }) {
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { logout } = useAdminAuth();
 
   return (

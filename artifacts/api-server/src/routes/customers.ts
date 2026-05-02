@@ -18,17 +18,27 @@ interface CustomerRow {
 function mapOrder(o: typeof ordersTable.$inferSelect) {
   return {
     id: o.id,
+    orderNumber: o.orderNumber,
     customerName: o.customerName,
     customerEmail: o.customerEmail,
     customerPhone: o.customerPhone,
     shippingAddress: o.shippingAddress,
+    addressLine2: o.addressLine2,
     city: o.city,
+    province: o.province,
+    postalCode: o.postalCode,
     country: o.country,
     status: o.status,
+    paymentMethod: o.paymentMethod,
+    paymentStatus: o.paymentStatus,
+    couponCode: o.couponCode ?? null,
+    discountAmount: Number(o.discountAmount),
     items: o.items,
     subtotal: Number(o.subtotal),
     shippingCost: Number(o.shippingCost),
     total: Number(o.total),
+    trackingNumber: o.trackingNumber ?? null,
+    notes: o.notes ?? null,
     createdAt: o.createdAt.toISOString(),
   };
 }
