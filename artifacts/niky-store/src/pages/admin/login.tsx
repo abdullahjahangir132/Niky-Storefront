@@ -27,7 +27,7 @@ export default function AdminLogin() {
       <div className="w-full max-w-sm space-y-10">
         <div className="text-center">
           <h1 className="font-display font-black text-5xl text-white tracking-tighter uppercase">
-            NANO<span className="text-accent">SHOES</span>
+            NANO<span className="text-accent"> SHOES</span>
           </h1>
           <p className="text-white/40 text-sm font-medium uppercase tracking-[0.3em] mt-2">Admin Portal</p>
           <p className="text-accent text-sm font-semibold mt-3">Password hint: nano-admin-2024</p>
