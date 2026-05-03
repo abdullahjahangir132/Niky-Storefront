@@ -30,6 +30,7 @@ export default function AdminLogin() {
             NANO<span className="text-accent">SHOES</span>
           </h1>
           <p className="text-white/40 text-sm font-medium uppercase tracking-[0.3em] mt-2">Admin Portal</p>
+          <p className="text-accent text-sm font-semibold mt-3">Password hint: nano-admin-2024</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -48,7 +49,6 @@ export default function AdminLogin() {
           >
             Enter Admin
           </Button>
-          <p className="text-center text-white/20 text-xs font-mono pt-2">nano-admin-2024</p>
         </form>
       </div>
     </div>
