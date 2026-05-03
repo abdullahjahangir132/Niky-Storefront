@@ -45,20 +45,13 @@ const queryClient = new QueryClient({
   },
 });
 
-function AdminInner() {
+function AdminWrapper({ component: Component }: { component: React.ComponentType<any> }) {
   return (
-    <Switch>
-      <Route path="/admin/products/new" component={AdminProductForm} />
-      <Route path="/admin/products/:id/edit" component={AdminProductForm} />
-      <Route path="/admin/products" component={AdminProducts} />
-      <Route path="/admin/orders" component={AdminOrders} />
-      <Route path="/admin/categories" component={AdminCategories} />
-      <Route path="/admin/customers" component={AdminCustomers} />
-      <Route path="/admin/coupons" component={AdminCoupons} />
-      <Route path="/admin/settings" component={AdminSettings} />
-      <Route path="/admin" component={AdminDashboard} />
-      <Route component={NotFound} />
-    </Switch>
+    <ProtectedAdminRoute>
+      <AdminLayout>
+        <Component />
+      </AdminLayout>
+    </ProtectedAdminRoute>
   );
 }
 
@@ -74,14 +67,16 @@ function App() {
                   {/* Admin login — standalone, no layout */}
                   <Route path="/admin/login" component={AdminLogin} />
 
-                  {/* All other /admin/* routes — protected + AdminLayout */}
-                  <Route path="/admin/:rest*">
-                    <ProtectedAdminRoute>
-                      <AdminLayout>
-                        <AdminInner />
-                      </AdminLayout>
-                    </ProtectedAdminRoute>
-                  </Route>
+                  {/* Admin routes — protected + AdminLayout (most specific first) */}
+                  <Route path="/admin/products/new" component={() => <AdminWrapper component={AdminProductForm} />} />
+                  <Route path="/admin/products/:id/edit" component={() => <AdminWrapper component={AdminProductForm} />} />
+                  <Route path="/admin/products" component={() => <AdminWrapper component={AdminProducts} />} />
+                  <Route path="/admin/orders" component={() => <AdminWrapper component={AdminOrders} />} />
+                  <Route path="/admin/categories" component={() => <AdminWrapper component={AdminCategories} />} />
+                  <Route path="/admin/customers" component={() => <AdminWrapper component={AdminCustomers} />} />
+                  <Route path="/admin/coupons" component={() => <AdminWrapper component={AdminCoupons} />} />
+                  <Route path="/admin/settings" component={() => <AdminWrapper component={AdminSettings} />} />
+                  <Route path="/admin" component={() => <AdminWrapper component={AdminDashboard} />} />
 
                   {/* Storefront — catch-all (must be last in Switch) */}
                   <Route>
