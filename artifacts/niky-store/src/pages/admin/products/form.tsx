@@ -19,13 +19,20 @@ const productSchema = z.object({
   description: z.string().min(10, "Description is required"),
   price: z.coerce.number().min(1, "Price must be > 0"),
   salePrice: z.coerce.number().optional().nullable(),
+  costPrice: z.coerce.number().optional().nullable(),
   categoryId: z.coerce.number().min(1, "Category is required"),
-  imageUrl: z.string().url("Must be a valid URL"),
+  imageUrl: z.string().min(1, "Image URL is required"),
   stock: z.coerce.number().min(0, "Stock cannot be negative"),
   sizes: z.string().min(1, "At least one size required"),
   colors: z.string().min(1, "At least one color required"),
+  shortDescription: z.string().optional(),
+  mainCategory: z.string().optional(),
+  subCategory: z.string().optional(),
+  brandLine: z.string().optional(),
+  sku: z.string().optional(),
   isFeatured: z.boolean().default(false),
   isNew: z.boolean().default(false),
+  isOnSale: z.boolean().default(false),
 });
 
 type FormValues = {
@@ -33,13 +40,20 @@ type FormValues = {
   description: string;
   price: number;
   salePrice?: number | null;
+  costPrice?: number | null;
   categoryId: number;
   imageUrl: string;
   stock: number;
   sizes: string;
   colors: string;
+  shortDescription?: string;
+  mainCategory?: string;
+  subCategory?: string;
+  brandLine?: string;
+  sku?: string;
   isFeatured: boolean;
   isNew: boolean;
+  isOnSale: boolean;
 };
 
 export default function AdminProductForm() {
@@ -71,11 +85,16 @@ export default function AdminProductForm() {
   const form = useForm<FormValues>({
     resolver: zodResolver(productSchema as any),
     defaultValues: {
-      name: "", description: "", price: 0, salePrice: null,
+      name: "", description: "", price: 0, salePrice: null, costPrice: null,
       categoryId: 0, imageUrl: "", stock: 0,
       sizes: "7, 8, 9, 10, 11, 12",
       colors: "Black, White",
-      isFeatured: false, isNew: true,
+      shortDescription: "",
+      mainCategory: "men",
+      subCategory: "",
+      brandLine: "",
+      sku: "",
+      isFeatured: false, isNew: true, isOnSale: false,
     },
   });
 
