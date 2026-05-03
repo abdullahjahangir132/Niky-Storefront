@@ -35,13 +35,6 @@ export default function StoreFooter() {
               <li><Link href="/about" className="hover:text-white transition-colors">About Us</Link></li>
             </ul>
           </div>
-
-          <div>
-            <h4 className="font-display font-bold uppercase tracking-wider mb-6 text-lg">Admin</h4>
-            <ul className="space-y-4 text-sm text-gray-400 font-medium">
-              <li><Link href="/admin" className="hover:text-white transition-colors">Admin Portal</Link></li>
-            </ul>
-          </div>
         </div>
         
         <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between text-xs text-gray-500 font-medium">
