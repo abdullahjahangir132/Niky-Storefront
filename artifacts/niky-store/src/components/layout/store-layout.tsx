@@ -1,6 +1,7 @@
 import StoreNavbar from "./store-navbar";
 import StoreFooter from "./store-footer";
 import CartDrawer from "../storefront/cart-drawer";
+import { NanoBotWidget } from "../storefront/nano-bot-widget";
 
 export function StoreLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -11,6 +12,7 @@ export function StoreLayout({ children }: { children: React.ReactNode }) {
       </main>
       <StoreFooter />
       <CartDrawer />
+      <NanoBotWidget />
     </div>
   );
 }

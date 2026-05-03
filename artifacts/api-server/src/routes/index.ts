@@ -12,6 +12,7 @@ import couponsRouter from "./coupons";
 import settingsRouter from "./settings";
 import wishlistsRouter from "./wishlists";
 import reviewsRouter from "./reviews";
+import chatRouter from "./chat";
 
 const router: IRouter = Router();
 
@@ -28,5 +29,6 @@ router.use(couponsRouter);
 router.use(settingsRouter);
 router.use(wishlistsRouter);
 router.use(reviewsRouter);
+router.use(chatRouter);
 
 export default router;
