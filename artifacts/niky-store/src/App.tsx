@@ -23,6 +23,7 @@ import About from "@/pages/storefront/about";
 import Contact from "@/pages/storefront/contact";
 import Faqs from "@/pages/storefront/faqs";
 import SizeGuide from "@/pages/storefront/size-guide";
+import Chatbot from "@/pages/storefront/chatbot";
 
 // Admin
 import AdminLogin from "@/pages/admin/login";
@@ -97,6 +98,7 @@ function App() {
                         <Route path="/wishlist" component={Wishlist} />
                         <Route path="/about" component={About} />
                         <Route path="/contact" component={Contact} />
+                        <Route path="/bot" component={Chatbot} />
                         <Route path="/faqs" component={Faqs} />
                         <Route path="/size-guide" component={SizeGuide} />
                         <Route component={NotFound} />
