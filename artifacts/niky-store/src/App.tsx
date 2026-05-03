@@ -48,15 +48,15 @@ const queryClient = new QueryClient({
 function AdminInner() {
   return (
     <Switch>
-      <Route path="/admin" component={AdminDashboard} />
-      <Route path="/admin/products/new" component={AdminProductForm} />
-      <Route path="/admin/products/:id/edit" component={AdminProductForm} />
-      <Route path="/admin/products" component={AdminProducts} />
-      <Route path="/admin/orders" component={AdminOrders} />
-      <Route path="/admin/categories" component={AdminCategories} />
-      <Route path="/admin/customers" component={AdminCustomers} />
-      <Route path="/admin/coupons" component={AdminCoupons} />
-      <Route path="/admin/settings" component={AdminSettings} />
+      <Route path="/products/new" component={AdminProductForm} />
+      <Route path="/products/:id/edit" component={AdminProductForm} />
+      <Route path="/products" component={AdminProducts} />
+      <Route path="/orders" component={AdminOrders} />
+      <Route path="/categories" component={AdminCategories} />
+      <Route path="/customers" component={AdminCustomers} />
+      <Route path="/coupons" component={AdminCoupons} />
+      <Route path="/settings" component={AdminSettings} />
+      <Route path="/" component={AdminDashboard} />
       <Route component={NotFound} />
     </Switch>
   );

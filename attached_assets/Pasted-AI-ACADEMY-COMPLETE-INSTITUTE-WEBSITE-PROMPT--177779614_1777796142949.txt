@@ -1,0 +1,376 @@
+AI ACADEMY — COMPLETE INSTITUTE WEBSITE PROMPT
+================================================
+
+===== SECTION 1: PROJECT OVERVIEW & TECH STACK =====
+
+You are a Senior Full-Stack Engineer. Build a complete, production-ready Institute Website called "AI Academy" using the following tech stack:
+
+Framework   : Next.js 14 (App Router)
+Database    : PostgreSQL + Prisma ORM (all data persists — no data loss on refresh)
+Auth        : NextAuth.js (role-based: ADMIN, USER/Student, VENDOR)
+UI          : Tailwind CSS + Framer Motion (smooth, working animations)
+Icons       : Lucide React
+Chatbot     : Built-in AI chatbot using Vercel AI SDK or simple API route
+Hosting     : Replit-compatible (single repo, env variables for secrets)
+
+CRITICAL RULES — read before writing a single line of code:
+1. Every page must work end-to-end — no broken routes, no dead links
+2. All animations must use Framer Motion properly (no CSS hacks that break)
+3. Admin panel must open correctly and all CRUD operations must save to DB
+4. Demo/seed data must be visible on first load without any manual setup
+5. The chatbot must respond — it cannot be a placeholder widget
+
+===== SECTION 2: BRANDING & LOGO =====
+
+LOGO & BRANDING:
+Design a professional SVG logo for "AI Academy" with these specs:
+- Icon: A stylized graduation cap fused with a neural network / circuit node motif
+- Text: "AI Academy" in a clean modern sans-serif, bold weight
+- Color palette: Deep indigo (#4F46E5) primary + electric violet (#7C3AED) accent + white text
+- The logo must appear in: Navbar, Favicon, Footer, Login page, and Loading splash screen
+- Export as both full logo (icon + text) and icon-only variant for mobile navbar
+
+DESIGN SYSTEM:
+- Primary color  : #4F46E5 (indigo)
+- Accent color   : #7C3AED (violet)
+- Background     : #0F0F1A (near-black dark) for main, #1A1A2E for cards
+- Text primary   : #F8FAFC (white)
+- Text secondary : #94A3B8 (slate gray)
+- Success        : #10B981 | Warning: #F59E0B | Danger: #EF4444
+- Font           : Inter (Google Fonts)
+- Border radius  : 12px for cards, 8px for buttons, 24px for pills
+- Every surface uses a subtle 1px border: rgba(255,255,255,0.08)
+
+===== SECTION 3: PUBLIC WEBSITE =====
+
+PUBLIC WEBSITE — Pages visible to all visitors:
+
+1. HOMEPAGE (/)
+   Hero section:
+   - Full-screen hero with animated gradient background (Framer Motion)
+   - AI Academy logo centered, tagline: "Learn Smarter. Grow Faster."
+   - Two CTA buttons: "Explore Courses" (scrolls down) + "Enroll Now" (goes to /register)
+   - Floating animated particles or grid pattern in background (CSS only, no heavy libs)
+
+   Courses section (demo data, editable from admin):
+   - Display course cards in a responsive 3-column grid
+   - Each card shows: Course thumbnail, title, duration, price, "Enroll" button
+   - DEMO COURSES pre-loaded (seed data):
+     * Web Development Bootcamp — 6 months — Rs. 25,000
+     * Data Science with Python — 4 months — Rs. 20,000
+     * UI/UX Design Mastery — 3 months — Rs. 15,000
+     * Digital Marketing Pro — 2 months — Rs. 12,000
+     * Mobile App Development — 5 months — Rs. 22,000
+     * AI & Machine Learning — 6 months — Rs. 30,000
+   - Hover animation: card lifts up with soft glow (Framer Motion whileHover)
+
+   About section:
+   - Institute stats: "500+ Students", "20+ Courses", "15+ Expert Teachers", "95% Job Rate"
+   - Animate numbers counting up when scrolled into view (Framer Motion useInView)
+
+   Testimonials section:
+   - Auto-sliding testimonial carousel (Framer Motion AnimatePresence)
+   - 4 demo student reviews pre-loaded
+
+   Contact section (editable from admin panel):
+   - Phone number, email address, physical address, Google Maps embed placeholder
+   - Contact form (name, email, message) — saves to DB, admin gets notification
+
+2. COURSES PAGE (/courses)
+   - Grid of all courses with search bar and filter by category/price
+   - Each course opens a detail page (/courses/[slug])
+   - Course detail: full description, curriculum list, teacher name, enrollment button
+
+3. ABOUT PAGE (/about)
+   - Institute history, mission, team section with teacher cards
+
+4. CONTACT PAGE (/contact)
+   - Full contact form + address + phone (all editable from admin)
+
+5. NAVBAR (all pages):
+   - Sticky glassmorphism navbar (backdrop-blur, semi-transparent)
+   - Links: Home | Courses | About | Contact | Login
+   - Mobile: hamburger menu with slide-in drawer (Framer Motion)
+   - AI Academy logo on left
+
+6. FOOTER:
+   - Logo + tagline + quick links + social icons + copyright
+
+===== SECTION 4: AI CHATBOT =====
+
+AI CHATBOT (floating widget on all public pages):
+
+APPEARANCE:
+- Floating button (bottom-right corner) with AI Academy logo icon
+- Click to open a chat drawer/modal with smooth Framer Motion animation
+- Header: "AI Academy Assistant" with green online dot
+- Clean chat bubbles: user messages right-aligned (indigo), bot left-aligned (dark card)
+
+FUNCTIONALITY — The chatbot must actually respond:
+- Use a Next.js API route (/api/chat) with hardcoded intelligent responses
+- NO external AI API needed — use a rule-based response system with keyword matching
+- The chatbot knows and answers:
+
+  Q: What courses do you offer?
+  A: We offer 6 courses: Web Development (6 months, Rs.25,000), Data Science (4 months, Rs.20,000), UI/UX Design (3 months, Rs.15,000), Digital Marketing (2 months, Rs.12,000), Mobile App Development (5 months, Rs.22,000), and AI & Machine Learning (6 months, Rs.30,000). Which one interests you?
+
+  Q: What is your address / where are you located?
+  A: AI Academy is located at [ADDRESS FROM DB — fetched dynamically]. You can also reach us at [PHONE FROM DB].
+
+  Q: How do I enroll / admission?
+  A: Enrollment is simple! Click "Enroll Now" on the homepage or visit our Courses page. You can also call us directly for in-person admission.
+
+  Q: What are your timings / hours?
+  A: We are open Monday to Saturday, 9:00 AM to 7:00 PM. Sunday classes available for some courses.
+
+  Q: Price / fee / cost?
+  A: Our courses range from Rs.12,000 to Rs.30,000 depending on duration. We also offer installment payment plans. Contact us for details.
+
+  Q: Hello / Hi / Assalam
+  A: Assalam-o-Alaikum! Welcome to AI Academy. I'm here to help you. You can ask me about our courses, fees, location, or admission process.
+
+  Default: I'm not sure about that. Please call us at [PHONE FROM DB] or visit our Contact page for more information.
+
+ADMIN EDITABLE:
+- Admin can update: institute address, phone, business hours from admin panel
+- Chatbot fetches these from DB dynamically so answers stay current
+
+CHATBOT DB MODEL:
+model InstituteInfo {
+  id       String @id @default(cuid())
+  phone    String
+  email    String
+  address  String
+  hours    String
+  mapEmbed String
+  updatedAt DateTime @updatedAt
+}
+
+===== SECTION 5: THREE DASHBOARDS =====
+
+THREE ROLE-BASED DASHBOARDS — each completely separate with its own layout:
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DASHBOARD 1: SUPER ADMIN (/admin)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Access: Only users with role = ADMIN
+Layout: Dark sidebar (collapsible) + main content area
+
+Sidebar links:
+- Dashboard (overview stats)
+- Courses Management
+- Users Management
+- Vendors Management
+- Enrollments
+- Contact Inquiries
+- Institute Settings
+- Chatbot Settings
+
+DASHBOARD HOME — Stats cards (animated with Framer Motion on mount):
+- Total Students enrolled
+- Total Courses active
+- Total Vendors
+- New inquiries today
+- Revenue this month
+
+COURSES MANAGEMENT:
+- Full table: Course name | Category | Duration | Price | Status | Actions
+- Add New Course button → modal form (title, description, price, duration, category, thumbnail URL, teacher)
+- Edit button → pre-filled modal
+- Delete button → confirmation dialog
+- Toggle Active/Inactive status
+- ALL CHANGES save to PostgreSQL immediately
+
+USERS MANAGEMENT:
+- Table: Name | Email | Role | Enrolled Course | Join Date | Status | Actions
+- Search by name/email
+- Change user role (promote to VENDOR or ADMIN)
+- Ban/Unban user
+- View user profile
+
+VENDORS MANAGEMENT:
+- Table: Vendor name | Email | Business name | Products/Services | Join Date | Actions
+- Approve or reject vendor registration
+- View vendor details
+
+ENROLLMENTS:
+- Table: Student name | Course | Enrollment date | Payment status | Actions
+- Mark payment as received
+- Export as CSV
+
+CONTACT INQUIRIES:
+- Table: Name | Email | Message | Date | Status (New/Replied)
+- Mark as replied
+- Reply via email (mailto link)
+
+INSTITUTE SETTINGS (updates chatbot + contact section):
+- Edit: Phone number, Email, Address, Business hours, Google Maps embed code
+- Save changes → updates DB → chatbot automatically uses new data
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DASHBOARD 2: STUDENT/USER (/dashboard)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Access: Logged-in users with role = USER
+Layout: Clean top navbar + card-based content
+
+Sections:
+- Welcome card: "Welcome back, [Name]!"
+- My Enrolled Courses: cards showing course name, progress bar, teacher
+- Profile: edit name, email, profile picture (upload to Cloudinary)
+- My Payments: history of payments made
+- Notifications: any messages from admin
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DASHBOARD 3: VENDOR (/vendor)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Access: Users with role = VENDOR
+Layout: Sidebar with vendor-specific links
+
+Sections:
+- Dashboard overview: my products/services listed
+- Add Product/Service: form to add their offering
+- My Listings: table of all their listings with edit/delete
+- Profile settings
+- Messages from admin
+
+===== SECTION 6: AUTH, ANIMATIONS & DATABASE =====
+
+AUTHENTICATION SYSTEM:
+- Login page (/login): Email + password, "Remember me", forgot password link
+- Register page (/register): Name, email, phone, password, role selection (Student/Vendor)
+- NextAuth.js handles sessions with JWT
+- Protected routes: /admin → ADMIN only, /vendor → VENDOR only, /dashboard → USER only
+- Redirect unauthorized users to /login with error message
+- After login, redirect to correct dashboard based on role
+
+ANIMATIONS — Must use Framer Motion correctly (no broken animations):
+1. Page transitions: each page fades in with opacity 0→1 + y: 20→0, duration 0.4s
+2. Cards: staggered mount animation (each card delays by 0.1s using staggerChildren)
+3. Navbar: mobile menu slides in from left (x: -100%→0)
+4. Hero section: text appears word by word or line by line
+5. Stats counter: numbers count up from 0 when scrolled into view (useInView hook)
+6. Course cards: whileHover scale 1.02 + shadow increase
+7. Chatbot: chat window slides up from bottom-right (y: 100→0, opacity 0→1)
+8. Modals: scale 0.9→1 + opacity 0→1
+9. Sidebar: smooth collapse/expand with width animation
+10. Toast notifications: slide in from top-right, auto-dismiss after 3 seconds
+
+COMPLETE PRISMA SCHEMA:
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  phone     String?
+  role      Role     @default(USER)
+  image     String?
+  createdAt DateTime @default(now())
+  enrollments Enrollment[]
+  inquiries   Inquiry[]
+}
+
+enum Role { ADMIN USER VENDOR }
+
+model Course {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String
+  price       Float
+  duration    String
+  category    String
+  thumbnail   String?
+  teacher     String
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  enrollments Enrollment[]
+}
+
+model Enrollment {
+  id        String   @id @default(cuid())
+  userId    String
+  courseId  String
+  user      User     @relation(fields:[userId], references:[id])
+  course    Course   @relation(fields:[courseId], references:[id])
+  paymentStatus String @default("PENDING")
+  createdAt DateTime @default(now())
+}
+
+model Inquiry {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  message   String
+  status    String   @default("NEW")
+  createdAt DateTime @default(now())
+}
+
+model InstituteInfo {
+  id       String @id @default(cuid())
+  phone    String @default("+92-300-0000000")
+  email    String @default("info@aiacademy.com")
+  address  String @default("123 Main Street, Karachi, Pakistan")
+  hours    String @default("Mon-Sat: 9:00 AM - 7:00 PM")
+  mapEmbed String @default("")
+  updatedAt DateTime @updatedAt
+}
+
+model Vendor {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  businessName String
+  description String?
+  isApproved  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+SEED FILE (prisma/seed.ts):
+Create these records on first run:
+1. Admin user: name="Super Admin", email="admin@aiacademy.com", password="Admin@123" (bcrypt hashed), role=ADMIN
+2. Sample student: name="Ali Hassan", email="student@test.com", password="Test@123", role=USER
+3. Sample vendor: name="Ahmed Supplies", email="vendor@test.com", password="Test@123", role=VENDOR
+4. All 6 courses listed above with proper data
+5. 1 InstituteInfo record with default contact details
+6. 2 sample enrollments for the demo student
+
+FOLDER STRUCTURE:
+/app
+  /(public)         → layout with navbar + chatbot
+    /page.tsx       → Homepage
+    /courses/       → Course listing + detail pages
+    /about/
+    /contact/
+    /login/
+    /register/
+  /admin/           → Admin dashboard (protected)
+  /dashboard/       → Student dashboard (protected)
+  /vendor/          → Vendor dashboard (protected)
+  /api/
+    /auth/          → NextAuth
+    /chat/          → Chatbot API route
+    /courses/       → CRUD
+    /users/         → CRUD
+    /institute/     → Settings CRUD
+/components
+  /Navbar.tsx
+  /Footer.tsx
+  /Chatbot.tsx
+  /CourseCard.tsx
+  /AnimatedCounter.tsx
+  /PageWrapper.tsx  → Framer Motion page transition wrapper
+/prisma
+  schema.prisma
+  seed.ts
+/lib
+  prisma.ts
+  auth.ts
+
+README.md with:
+1. npm install
+2. Set up .env: DATABASE_URL, NEXTAUTH_SECRET, NEXTAUTH_URL
+3. npx prisma migrate dev
+4. npx prisma db seed
+5. npm run dev
+→ Visit http://localhost:3000
+→ Admin: admin@aiacademy.com / Admin@123
+

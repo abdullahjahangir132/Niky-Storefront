@@ -105,13 +105,20 @@ export default function AdminProductForm() {
         description: product.description,
         price: product.price,
         salePrice: product.salePrice,
+        costPrice: product.costPrice,
         categoryId: product.categoryId,
         imageUrl: product.imageUrl,
         stock: product.stock,
         sizes: product.sizes.join(", "),
-        colors: product.colors.join(", "),
+        colors: product.colors.map(c => typeof c === 'string' ? c : c.name).join(", "),
+        shortDescription: product.shortDescription || "",
+        mainCategory: product.mainCategory || "men",
+        subCategory: product.subCategory || "",
+        brandLine: product.brandLine || "",
+        sku: product.sku || "",
         isFeatured: product.isFeatured,
         isNew: product.isNew,
+        isOnSale: product.isOnSale || false,
       });
     }
   }, [product, form]);
