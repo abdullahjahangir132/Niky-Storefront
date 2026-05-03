@@ -83,6 +83,14 @@ function App() {
                     </ProtectedAdminRoute>
                   </Route>
 
+                  <Route path="/admin">
+                    <ProtectedAdminRoute>
+                      <AdminLayout>
+                        <AdminDashboard />
+                      </AdminLayout>
+                    </ProtectedAdminRoute>
+                  </Route>
+
                   {/* Storefront — catch-all (must be last in Switch) */}
                   <Route>
                     <StoreLayout>
