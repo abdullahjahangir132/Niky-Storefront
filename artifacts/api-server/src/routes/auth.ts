@@ -3,7 +3,7 @@ import { AdminLoginBody } from "@workspace/api-zod";
 
 const router = Router();
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "niky-admin-2024";
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "nano-admin-2024";
 
 // POST /api/admin/auth/login
 router.post("/admin/auth/login", (req: Request, res: Response) => {
@@ -18,7 +18,7 @@ router.post("/admin/auth/login", (req: Request, res: Response) => {
     return;
   }
 
-  (req.session as Record<string, unknown>).adminAuthenticated = true;
+  (req.session as typeof req.session & { adminAuthenticated?: boolean }).adminAuthenticated = true;
   res.json({ authenticated: true });
 });
 
@@ -31,7 +31,7 @@ router.post("/admin/auth/logout", (req: Request, res: Response) => {
 
 // GET /api/admin/auth/me
 router.get("/admin/auth/me", (req: Request, res: Response) => {
-  const authenticated = !!(req.session as Record<string, unknown>).adminAuthenticated;
+  const authenticated = !!(req.session as typeof req.session & { adminAuthenticated?: boolean }).adminAuthenticated;
   res.json({ authenticated });
 });
 
