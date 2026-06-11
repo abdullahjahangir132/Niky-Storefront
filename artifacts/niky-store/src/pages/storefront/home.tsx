@@ -13,14 +13,15 @@ export default function Home() {
   return (
     <>
       {/* Hero Section */}
-      <section className="relative h-[calc(100vh-5rem)] min-h-[600px] w-full overflow-hidden bg-black flex items-center justify-center -mt-20 pt-20">
+      <section className="relative h-screen min-h-[600px] w-full overflow-hidden bg-black flex items-center justify-center -mt-20">
         <div className="absolute inset-0 z-0">
           <img
             src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=1600&q=80"
             alt="Hero"
-            className="w-full h-full object-cover opacity-50"
+            className="w-full h-full object-cover opacity-60"
+            loading="eager"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-black/40" />
         </div>
 
         <div className="relative z-10 text-center px-4 max-w-5xl mx-auto">
@@ -64,11 +65,17 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Brand Lines */}
-      <section className="border-y border-border py-5 overflow-hidden bg-secondary/10">
-        <div className="flex gap-16 items-center whitespace-nowrap animate-[marquee_20s_linear_infinite]">
-          {["Nano Air", "Nano Pro", "Nano Flex", "Nano Classic", "Nano Air", "Nano Pro", "Nano Flex", "Nano Classic"].map((b, i) => (
-            <span key={i} className="font-display font-black text-xl uppercase tracking-widest text-muted-foreground/40">{b}</span>
+      {/* Brand Lines Marquee */}
+      <section className="border-y border-border py-4 overflow-hidden bg-secondary/10">
+        <div className="flex animate-marquee whitespace-nowrap">
+          {["Nano Air", "Nano Pro", "Nano Flex", "Nano Classic", "Nano Air", "Nano Pro", "Nano Flex", "Nano Classic", "Nano Air", "Nano Pro", "Nano Flex", "Nano Classic", "Nano Air", "Nano Pro", "Nano Flex", "Nano Classic"].map((b, i) => (
+            <Link
+              key={i}
+              href={`/shop?brandLine=${encodeURIComponent(b)}`}
+              className="mx-10 font-display font-black text-xl uppercase tracking-widest text-muted-foreground/50 hover:text-accent transition-colors duration-200 cursor-pointer flex-shrink-0"
+            >
+              {b} <span className="text-accent/30 mx-4">✦</span>
+            </Link>
           ))}
         </div>
       </section>

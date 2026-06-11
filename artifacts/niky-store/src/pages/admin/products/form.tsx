@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRoute, useLocation } from "wouter";
 import { useGetProduct, useCreateProduct, useUpdateProduct, useListCategories } from "@workspace/api-client-react";
 import { useForm } from "react-hook-form";
@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Package } from "lucide-react";
+import { ArrowLeft, Package, Upload, Link2, X } from "lucide-react";
 import { Link } from "wouter";
 
 const productSchema = z.object({
@@ -55,6 +55,82 @@ type FormValues = {
   isNew: boolean;
   isOnSale: boolean;
 };
+
+function ImageUploadField({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [mode, setMode] = useState<"url" | "upload">("url");
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
+
+  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const form = new FormData();
+      form.append("image", file);
+      const res = await fetch("/api/upload", { method: "POST", body: form });
+      if (!res.ok) throw new Error("Upload failed");
+      const data = await res.json();
+      onChange(data.url);
+      toast({ title: "Image uploaded", description: "File saved successfully." });
+    } catch {
+      toast({ title: "Upload failed", description: "Could not upload image.", variant: "destructive" });
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  return (
+    <div className="space-y-3">
+      <div className="flex gap-2">
+        <button
+          type="button"
+          onClick={() => setMode("url")}
+          className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded border transition-colors ${mode === "url" ? "bg-primary text-primary-foreground border-primary" : "border-border text-muted-foreground hover:border-foreground"}`}
+        >
+          <Link2 size={12} /> URL
+        </button>
+        <button
+          type="button"
+          onClick={() => setMode("upload")}
+          className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded border transition-colors ${mode === "upload" ? "bg-primary text-primary-foreground border-primary" : "border-border text-muted-foreground hover:border-foreground"}`}
+        >
+          <Upload size={12} /> Upload File
+        </button>
+      </div>
+
+      {mode === "url" ? (
+        <Input value={value} onChange={e => onChange(e.target.value)} placeholder="https://images.unsplash.com/..." />
+      ) : (
+        <div
+          onClick={() => fileRef.current?.click()}
+          className="border-2 border-dashed border-border rounded-lg p-6 flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-accent transition-colors"
+        >
+          <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
+          <Upload size={24} className="text-muted-foreground" />
+          <p className="text-sm text-muted-foreground">
+            {uploading ? "Uploading..." : "Click to select an image (max 5MB)"}
+          </p>
+          <p className="text-xs text-muted-foreground/50">JPG, PNG, WebP supported</p>
+        </div>
+      )}
+
+      {value && (
+        <div className="relative w-24 h-24 rounded-lg overflow-hidden border border-border group">
+          <img src={value} alt="Preview" className="w-full h-full object-cover" onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
+          <button
+            type="button"
+            onClick={() => onChange("")}
+            className="absolute inset-0 bg-black/60 hidden group-hover:flex items-center justify-center text-white"
+          >
+            <X size={16} />
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function AdminProductForm() {
   const [, params] = useRoute("/admin/products/:id/edit");
@@ -234,14 +310,11 @@ export default function AdminProductForm() {
 
               <FormField control={form.control} name="imageUrl" render={({ field }) => (
                 <FormItem className="md:col-span-2">
-                  <FormLabel>Primary Image URL</FormLabel>
-                  <FormControl><Input {...field} placeholder="https://images.unsplash.com/..." /></FormControl>
+                  <FormLabel>Product Image — URL ya File Upload</FormLabel>
+                  <FormControl>
+                    <ImageUploadField value={field.value} onChange={field.onChange} />
+                  </FormControl>
                   <FormMessage />
-                  {field.value && (
-                    <div className="mt-2 w-20 h-20 rounded-lg overflow-hidden border border-border">
-                      <img src={field.value} alt="Preview" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
-                    </div>
-                  )}
                 </FormItem>
               )} />
 

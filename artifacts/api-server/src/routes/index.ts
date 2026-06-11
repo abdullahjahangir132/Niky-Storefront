@@ -13,6 +13,7 @@ import settingsRouter from "./settings";
 import wishlistsRouter from "./wishlists";
 import reviewsRouter from "./reviews";
 import chatRouter from "./chat";
+import uploadRouter from "./upload";
 
 const router: IRouter = Router();
 
@@ -30,5 +31,6 @@ router.use(settingsRouter);
 router.use(wishlistsRouter);
 router.use(reviewsRouter);
 router.use(chatRouter);
+router.use(uploadRouter);
 
 export default router;
