@@ -30,6 +30,7 @@ function mapProduct(p: typeof productsTable.$inferSelect, categoryName: string) 
     tags: p.tags,
     imageUrl: p.imageUrl,
     imageUrls: p.imageUrls,
+    videoUrl: p.videoUrl,
     sizes: p.sizes,
     colors: p.colors,
     stock: p.stock,
@@ -159,6 +160,7 @@ router.post("/products", async (req, res) => {
     tags: data.tags ?? [],
     imageUrl: data.imageUrl ?? "",
     imageUrls: data.imageUrls ?? [],
+    videoUrl: data.videoUrl ?? "",
     sizes: data.sizes ?? [],
     colors: data.colors ?? [],
     stock: data.stock ?? 0,
@@ -194,6 +196,7 @@ router.put("/products/:id", async (req, res) => {
   if (data.tags !== undefined) updates.tags = data.tags;
   if (data.imageUrl !== undefined) updates.imageUrl = data.imageUrl;
   if (data.imageUrls !== undefined) updates.imageUrls = data.imageUrls;
+  if (data.videoUrl !== undefined) updates.videoUrl = data.videoUrl;
   if (data.sizes !== undefined) updates.sizes = data.sizes;
   if (data.colors !== undefined) updates.colors = data.colors;
   if (data.stock !== undefined) updates.stock = data.stock;

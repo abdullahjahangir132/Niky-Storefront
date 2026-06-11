@@ -30,6 +30,7 @@ export const productsTable = pgTable("products", {
   tags: json("tags").$type<string[]>().notNull().default([]),
   imageUrl: text("image_url").notNull().default(""),
   imageUrls: json("image_urls").$type<string[]>().notNull().default([]),
+  videoUrl: text("video_url").notNull().default(""),
   sizes: json("sizes").$type<string[]>().notNull().default([]),
   colors: json("colors").$type<{ name: string; hex: string }[]>().notNull().default([]),
   stock: integer("stock").notNull().default(0),
