@@ -25,6 +25,11 @@ const DEFAULT_SETTINGS = {
   cardEnabled: true,
   easypaisaEnabled: true,
   jazzcashEnabled: true,
+  // AI provider settings
+  aiProvider: "anthropic",
+  geminiApiKey: "",
+  openaiApiKey: "",
+  anthropicApiKey: "",
 };
 
 type SettingsType = typeof DEFAULT_SETTINGS;
@@ -48,6 +53,10 @@ async function getAllSettings(): Promise<SettingsType> {
     youtubeUrl: map.youtubeUrl ?? DEFAULT_SETTINGS.youtubeUrl,
     playStoreUrl: map.playStoreUrl ?? DEFAULT_SETTINGS.playStoreUrl,
     appStoreUrl: map.appStoreUrl ?? DEFAULT_SETTINGS.appStoreUrl,
+    aiProvider: map.aiProvider ?? DEFAULT_SETTINGS.aiProvider,
+    geminiApiKey: map.geminiApiKey ?? DEFAULT_SETTINGS.geminiApiKey,
+    openaiApiKey: map.openaiApiKey ?? DEFAULT_SETTINGS.openaiApiKey,
+    anthropicApiKey: map.anthropicApiKey ?? DEFAULT_SETTINGS.anthropicApiKey,
     shippingRate: Number(map.shippingRate ?? DEFAULT_SETTINGS.shippingRate),
     freeShippingThreshold: Number(map.freeShippingThreshold ?? DEFAULT_SETTINGS.freeShippingThreshold),
     currency: map.currency ?? DEFAULT_SETTINGS.currency,

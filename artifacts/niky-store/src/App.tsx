@@ -35,6 +35,7 @@ import AdminCategories from "@/pages/admin/categories/list";
 import AdminCustomers from "@/pages/admin/customers/list";
 import AdminCoupons from "@/pages/admin/coupons/list";
 import AdminSettings from "@/pages/admin/settings/index";
+import AdminAiUsage from "@/pages/admin/ai-usage/index";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -76,6 +77,7 @@ function App() {
                   <Route path="/admin/customers" component={() => <AdminWrapper component={AdminCustomers} />} />
                   <Route path="/admin/coupons" component={() => <AdminWrapper component={AdminCoupons} />} />
                   <Route path="/admin/settings" component={() => <AdminWrapper component={AdminSettings} />} />
+                  <Route path="/admin/ai-usage" component={() => <AdminWrapper component={AdminAiUsage} />} />
                   <Route path="/admin" component={() => <AdminWrapper component={AdminDashboard} />} />
 
                   {/* Storefront — catch-all (must be last in Switch) */}

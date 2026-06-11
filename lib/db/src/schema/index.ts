@@ -7,3 +7,4 @@ export * from "./settings";
 export * from "./users";
 export * from "./wishlists";
 export * from "./reviews";
+export * from "./ai-usage";

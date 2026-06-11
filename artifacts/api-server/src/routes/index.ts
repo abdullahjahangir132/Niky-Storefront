@@ -13,6 +13,7 @@ import settingsRouter from "./settings";
 import wishlistsRouter from "./wishlists";
 import reviewsRouter from "./reviews";
 import chatRouter from "./chat";
+import aiUsageRouter from "./ai-usage";
 import uploadRouter from "./upload";
 
 const router: IRouter = Router();
@@ -31,6 +32,7 @@ router.use(settingsRouter);
 router.use(wishlistsRouter);
 router.use(reviewsRouter);
 router.use(chatRouter);
+router.use(aiUsageRouter);
 router.use(uploadRouter);
 
 export default router;

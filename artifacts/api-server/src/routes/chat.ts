@@ -1,67 +1,73 @@
 import { Router } from "express";
 import { db } from "@workspace/db";
-import { productsTable, ordersTable, categoriesTable, settingsTable } from "@workspace/db";
+import {
+  productsTable,
+  ordersTable,
+  categoriesTable,
+  settingsTable,
+  aiUsageLogsTable,
+} from "@workspace/db";
 import { eq, like, or, desc } from "drizzle-orm";
 
 const router = Router();
 
-// 5-minute product cache to avoid hitting DB on every message
-let productCache: { data: string; ts: number } | null = null;
-const CACHE_TTL = 5 * 60 * 1000;
+// ── Product knowledge-base cache (5 min) ────────────────────────────────────
+let kbCache: { data: string; ts: number } | null = null;
+const KB_TTL = 5 * 60 * 1000;
 
 async function getLiveKnowledgeBase(): Promise<string> {
   const now = Date.now();
-  if (productCache && now - productCache.ts < CACHE_TTL) return productCache.data;
+  if (kbCache && now - kbCache.ts < KB_TTL) return kbCache.data;
 
   const [products, cats, settingsRows] = await Promise.all([
-    db.select({
-      id: productsTable.id,
-      name: productsTable.name,
-      price: productsTable.price,
-      salePrice: productsTable.salePrice,
-      brandLine: productsTable.brandLine,
-      mainCategory: productsTable.mainCategory,
-      subCategory: productsTable.subCategory,
-      sizes: productsTable.sizes,
-      colors: productsTable.colors,
-      stock: productsTable.stock,
-      isOnSale: productsTable.isOnSale,
-      isNew: productsTable.isNew,
-      isFeatured: productsTable.isFeatured,
-      status: productsTable.status,
-      slug: productsTable.slug,
-    }).from(productsTable).where(eq(productsTable.status, "active")),
-    db.select({ name: categoriesTable.name, slug: categoriesTable.slug }).from(categoriesTable),
+    db
+      .select({
+        name: productsTable.name,
+        price: productsTable.price,
+        salePrice: productsTable.salePrice,
+        brandLine: productsTable.brandLine,
+        mainCategory: productsTable.mainCategory,
+        sizes: productsTable.sizes,
+        colors: productsTable.colors,
+        stock: productsTable.stock,
+        isOnSale: productsTable.isOnSale,
+        isNew: productsTable.isNew,
+        isFeatured: productsTable.isFeatured,
+        status: productsTable.status,
+      })
+      .from(productsTable)
+      .where(eq(productsTable.status, "active")),
+    db.select({ name: categoriesTable.name }).from(categoriesTable),
     db.select().from(settingsTable),
   ]);
 
   const settings: Record<string, string> = {};
   for (const row of settingsRows) settings[row.key] = row.value;
 
-  // Group products by main category
   const byCategory: Record<string, typeof products> = {};
   for (const p of products) {
     const cat = p.mainCategory || "other";
-    if (!byCategory[cat]) byCategory[cat] = [];
-    byCategory[cat].push(p);
+    (byCategory[cat] ??= []).push(p);
   }
 
-  let productLines = "=== LIVE PRODUCT CATALOG (database) ===\n";
+  let productLines = "=== LIVE PRODUCT CATALOG ===\n";
   for (const [cat, prods] of Object.entries(byCategory)) {
-    productLines += `\n[${cat.toUpperCase()} SHOES]\n`;
+    productLines += `\n[${cat.toUpperCase()}]\n`;
     for (const p of prods) {
       const sizes = (p.sizes as string[]).join(", ") || "38-45";
-      const colors = (p.colors as { name: string }[]).map(c => c.name).join(", ") || "Multiple";
-      const inStock = Number(p.stock) > 0;
-      const priceStr = p.isOnSale && p.salePrice
-        ? `PKR ${Number(p.salePrice).toLocaleString()} (SALE — was PKR ${Number(p.price).toLocaleString()})`
-        : `PKR ${Number(p.price).toLocaleString()}`;
+      const colors = (p.colors as { name: string }[]).map((c) => c.name).join(", ") || "Multiple";
+      const priceStr =
+        p.isOnSale && p.salePrice
+          ? `PKR ${Number(p.salePrice).toLocaleString()} (SALE — was PKR ${Number(p.price).toLocaleString()})`
+          : `PKR ${Number(p.price).toLocaleString()}`;
       const badges = [
         p.isFeatured ? "FEATURED" : "",
-        p.isNew ? "NEW ARRIVAL" : "",
+        p.isNew ? "NEW" : "",
         p.isOnSale ? "ON SALE" : "",
-        inStock ? "IN STOCK" : "OUT OF STOCK",
-      ].filter(Boolean).join(" | ");
+        Number(p.stock) > 0 ? "IN STOCK" : "OUT OF STOCK",
+      ]
+        .filter(Boolean)
+        .join(" | ");
       productLines += `  • ${p.name} — ${priceStr} | Sizes: ${sizes} | Colors: ${colors} | Brand: ${p.brandLine || "Nano Shoes"} | ${badges}\n`;
     }
   }
@@ -70,67 +76,48 @@ async function getLiveKnowledgeBase(): Promise<string> {
   const whatsapp = settings.whatsappNumber || phone;
   const email = settings.contactEmail || "support@nanoshoes.pk";
   const address = settings.address || "Lahore, Pakistan";
-  const shippingRate = settings.shippingRate || "200";
-  const freeThreshold = settings.freeShippingThreshold || "3000";
-  const instagram = settings.instagramUrl || "";
-  const facebook = settings.facebookUrl || "";
 
   const kb = `${productLines}
-
 === STORE INFO ===
 Name: Nano Shoes | Tagline: Move Beyond Limits
-Address: ${address}
-Phone: ${phone} | WhatsApp: ${whatsapp} | Email: ${email}
-${instagram ? `Instagram: ${instagram}` : ""}
-${facebook ? `Facebook: ${facebook}` : ""}
-Working Hours: Monday–Saturday 10:00 AM – 8:00 PM
+Address: ${address} | Phone: ${phone} | WhatsApp: ${whatsapp} | Email: ${email}
+Hours: Mon–Sat 10AM–8PM
 
 === SHIPPING & PAYMENTS ===
-Shipping cost: PKR ${shippingRate} | Free shipping above PKR ${freeThreshold}
-Payment: COD (Cash on Delivery), Credit/Debit Card, EasyPaisa, JazzCash
-Delivery: Lahore 1–2 days | Karachi/Islamabad 2–3 days | Other cities 3–5 days
+Shipping: PKR ${settings.shippingRate || "200"} | Free above PKR ${settings.freeShippingThreshold || "3000"}
+Payment: COD, Credit/Debit Card, EasyPaisa, JazzCash
+Delivery: Lahore 1–2 days | Karachi/Islamabad 2–3 days | Other 3–5 days
 
 === POLICIES ===
-Returns: 7 days from delivery, shoes must be unworn, original box required
-Sale items: Exchange only, no cash refund
-Order tracking: Visit /track-order on the website and enter order number
-Coupon codes: NANO10 (10% off), NANO20 (20% off), WELCOME50 (50% off first order)
-Size guide: Available at /size-guide
+Returns: 7 days, unworn, original box | Sale items: exchange only
+Track order: /track-order | Size guide: /size-guide
+Coupons: NANO10 (10%), NANO20 (20%), WELCOME50 (50% first order)
 
 === CATEGORIES ===
-${cats.map(c => c.name).join(" | ")}`;
+${cats.map((c) => c.name).join(" | ")}`;
 
-  productCache = { data: kb, ts: now };
+  kbCache = { data: kb, ts: now };
   return kb;
 }
 
-/** Try to find order info if the user message contains an order number or email */
+// ── Order lookup ─────────────────────────────────────────────────────────────
 async function lookupOrderFromMessage(text: string): Promise<string | null> {
-  // Match patterns: ORD-12345, #12345, plain 5+ digit numbers
   const orderMatch = text.match(/\b(?:ORD[-\s]?\d{3,}|#\d{4,}|\d{6,})\b/i);
   const emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
-
   if (!orderMatch && !emailMatch) return null;
 
   try {
     let order = null;
-
     if (orderMatch) {
       const raw = orderMatch[0].replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
-      const numericId = parseInt(raw.replace(/[^0-9]/g, "")) || 0;
+      const numId = parseInt(raw.replace(/\D/g, "")) || 0;
       const results = await db
         .select()
         .from(ordersTable)
-        .where(
-          or(
-            like(ordersTable.orderNumber, `%${raw}%`),
-            numericId > 0 ? eq(ordersTable.id, numericId) : undefined,
-          ),
-        )
+        .where(or(like(ordersTable.orderNumber, `%${raw}%`), numId > 0 ? eq(ordersTable.id, numId) : undefined))
         .limit(1);
       order = results[0] ?? null;
     }
-
     if (!order && emailMatch) {
       const results = await db
         .select()
@@ -140,66 +127,231 @@ async function lookupOrderFromMessage(text: string): Promise<string | null> {
         .limit(1);
       order = results[0] ?? null;
     }
-
     if (!order) return null;
 
-    const statusLabels: Record<string, string> = {
-      pending: "⏳ Pending — Order received",
-      confirmed: "✅ Confirmed — Being processed",
-      shipped: "🚚 Shipped — On its way to you",
+    const statusMap: Record<string, string> = {
+      pending: "⏳ Pending",
+      confirmed: "✅ Confirmed",
+      shipped: "🚚 Shipped",
       delivered: "📦 Delivered",
       cancelled: "❌ Cancelled",
     };
 
-    const itemsList = (order.items as StoredItem[])
-      .map((i) => `${i.productName} × ${i.quantity} (Size: ${i.size}, Color: ${i.color || "—"}) — PKR ${Number(i.price).toLocaleString()}`)
-      .join("\n    ");
+    type Item = { productName: string; quantity: number; size: string; color?: string; price: number };
+    const items = (order.items as Item[])
+      .map((i) => `${i.productName} ×${i.quantity} (Size: ${i.size})`)
+      .join(", ");
 
-    return `=== ORDER FOUND IN DATABASE ===
-Order No: ${order.orderNumber || `#${order.id}`}
-Customer: ${order.customerName} | Phone: ${order.customerPhone || "—"}
-Status: ${statusLabels[order.status] || order.status}
-Payment: ${order.paymentMethod?.toUpperCase()} — ${order.paymentStatus}
-Items:
-    ${itemsList}
-Subtotal: PKR ${Number(order.subtotal).toLocaleString()} | Shipping: PKR ${Number(order.shippingCost).toLocaleString()} | Total: PKR ${Number(order.total).toLocaleString()}
-Shipping to: ${order.shippingAddress}, ${order.city}, ${order.province || "Pakistan"}
-${order.trackingNumber ? `Tracking Number: ${order.trackingNumber}` : "Tracking number will be shared once shipped."}
-${order.couponCode ? `Coupon used: ${order.couponCode} (Discount: PKR ${Number(order.discountAmount).toLocaleString()})` : ""}
-Order placed: ${new Date(order.createdAt).toLocaleDateString("en-PK", { dateStyle: "long" })}`;
+    return `=== ORDER FOUND ===
+Order No: ${order.orderNumber || `#${order.id}`} | Status: ${statusMap[order.status] || order.status}
+Customer: ${order.customerName} | Payment: ${order.paymentMethod?.toUpperCase()} — ${order.paymentStatus}
+Items: ${items}
+Total: PKR ${Number(order.total).toLocaleString()} | Shipping to: ${order.city}, ${order.province || "Pakistan"}
+${order.trackingNumber ? `Tracking: ${order.trackingNumber}` : "Tracking will be shared once shipped."}
+Placed: ${new Date(order.createdAt).toLocaleDateString("en-PK", { dateStyle: "long" })}`;
   } catch {
     return null;
   }
 }
 
-type StoredItem = { productName: string; quantity: number; size: string; color?: string; price: number };
+// ── AI provider settings ──────────────────────────────────────────────────────
+async function getAISettings() {
+  const rows = await db.select().from(settingsTable);
+  const map: Record<string, string> = {};
+  for (const row of rows) map[row.key] = row.value;
+  return {
+    provider: (map.aiProvider || "anthropic") as "gemini" | "openai" | "anthropic",
+    geminiApiKey: map.geminiApiKey || "",
+    openaiApiKey: map.openaiApiKey || "",
+    anthropicApiKey: map.anthropicApiKey || process.env.ANTHROPIC_API_KEY || "",
+  };
+}
 
-const BASE_SYSTEM_PROMPT = `You are Nano Bot — the friendly, knowledgeable AI assistant for Nano Shoes Pakistan.
+const BASE_SYSTEM = `You are Nano Bot — the friendly AI assistant for Nano Shoes Pakistan.
 
-LANGUAGE RULES (very important):
-- If user writes in English → reply in English
-- If user writes in Arabic → reply in Arabic (اعرب)
-- If user writes in Urdu script → reply in Urdu script
-- If user writes in Roman Urdu (Latin letters like "mujhe batao", "kya price hai") → reply in Roman Urdu (same Latin-script style)
-- Mix is fine — match the user's style
+LANGUAGE: Match the user's language exactly.
+- English → reply English
+- Roman Urdu (latin letters) → reply Roman Urdu
+- Arabic → reply Arabic
+- Urdu script → reply Urdu script
 
-SCOPE:
-- Only answer Nano Shoes related questions
-- If someone asks about something unrelated, say: "I can only help with Nano Shoes questions. For anything else, please contact support@nanoshoes.pk"
+SCOPE: Only answer Nano Shoes related questions. If unrelated, say: "I can only help with Nano Shoes questions. Contact support@nanoshoes.pk"
 
-BEHAVIOR:
-- Be warm, helpful, and professional
-- Use bullet points when listing items
-- For prices always say PKR (Pakistani Rupees)
-- When mentioning products from the catalog, say their exact name and price
-- If a product is out of stock, say so and suggest similar alternatives
-- For order tracking, use the real order data provided below if available
-- Always end with: "Kuch aur madad chahiye? / Is there anything else I can help you with?"`;
+STYLE: Warm, concise, use bullets for lists. Prices in PKR. End with: "Kuch aur madad chahiye? / Is there anything else I can help you with?"`;
 
+// ── Provider helpers ──────────────────────────────────────────────────────────
+
+type ChatMsg = { role: "user" | "assistant"; content: string };
+
+async function* streamGemini(
+  apiKey: string,
+  systemPrompt: string,
+  messages: ChatMsg[]
+): AsyncGenerator<{ text?: string; tokensIn?: number; tokensOut?: number }> {
+  const contents = messages.map((m) => ({
+    role: m.role === "assistant" ? "model" : "user",
+    parts: [{ text: m.content }],
+  }));
+
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:streamGenerateContent?alt=sse&key=${apiKey}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        system_instruction: { parts: [{ text: systemPrompt }] },
+        contents,
+        generationConfig: { maxOutputTokens: 600 },
+      }),
+    }
+  );
+
+  if (!res.ok || !res.body) throw new Error(`Gemini error: ${res.status}`);
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buf = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buf += decoder.decode(value, { stream: true });
+    const lines = buf.split("\n");
+    buf = lines.pop() ?? "";
+    for (const line of lines) {
+      if (!line.startsWith("data: ")) continue;
+      const payload = line.slice(6).trim();
+      if (!payload || payload === "[DONE]") continue;
+      try {
+        const event = JSON.parse(payload);
+        const text = event.candidates?.[0]?.content?.parts?.[0]?.text as string | undefined;
+        if (text) yield { text };
+        const usage = event.usageMetadata;
+        if (usage) {
+          yield {
+            tokensIn: usage.promptTokenCount ?? 0,
+            tokensOut: usage.candidatesTokenCount ?? 0,
+          };
+        }
+      } catch { /* skip */ }
+    }
+  }
+}
+
+async function* streamOpenAI(
+  apiKey: string,
+  systemPrompt: string,
+  messages: ChatMsg[]
+): AsyncGenerator<{ text?: string; tokensIn?: number; tokensOut?: number }> {
+  const res = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: "gpt-4o-mini",
+      max_completion_tokens: 600,
+      stream: true,
+      stream_options: { include_usage: true },
+      messages: [
+        { role: "system", content: systemPrompt },
+        ...messages.map((m) => ({ role: m.role, content: m.content })),
+      ],
+    }),
+  });
+
+  if (!res.ok || !res.body) throw new Error(`OpenAI error: ${res.status}`);
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buf = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buf += decoder.decode(value, { stream: true });
+    const lines = buf.split("\n");
+    buf = lines.pop() ?? "";
+    for (const line of lines) {
+      if (!line.startsWith("data: ")) continue;
+      const payload = line.slice(6).trim();
+      if (payload === "[DONE]") continue;
+      try {
+        const event = JSON.parse(payload);
+        const text = event.choices?.[0]?.delta?.content as string | undefined;
+        if (text) yield { text };
+        if (event.usage) {
+          yield {
+            tokensIn: event.usage.prompt_tokens ?? 0,
+            tokensOut: event.usage.completion_tokens ?? 0,
+          };
+        }
+      } catch { /* skip */ }
+    }
+  }
+}
+
+async function* streamAnthropic(
+  apiKey: string,
+  systemPrompt: string,
+  messages: ChatMsg[]
+): AsyncGenerator<{ text?: string; tokensIn?: number; tokensOut?: number }> {
+  const res = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": apiKey,
+      "anthropic-version": "2023-06-01",
+    },
+    body: JSON.stringify({
+      model: "claude-haiku-4-5",
+      max_tokens: 600,
+      system: systemPrompt,
+      stream: true,
+      messages: messages
+        .filter((m) => m.content.trim())
+        .map((m) => ({ role: m.role, content: m.content })),
+    }),
+  });
+
+  if (!res.ok || !res.body) throw new Error(`Anthropic error: ${res.status}`);
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buf = "";
+  let inputTokens = 0;
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buf += decoder.decode(value, { stream: true });
+    const lines = buf.split("\n");
+    buf = lines.pop() ?? "";
+    for (const line of lines) {
+      if (!line.startsWith("data: ")) continue;
+      const payload = line.slice(6).trim();
+      try {
+        const event = JSON.parse(payload);
+        if (event.type === "message_start") {
+          inputTokens = event.message?.usage?.input_tokens ?? 0;
+        }
+        if (event.type === "content_block_delta" && event.delta?.type === "text_delta") {
+          yield { text: event.delta.text };
+        }
+        if (event.type === "message_delta" && event.usage) {
+          yield { tokensIn: inputTokens, tokensOut: event.usage.output_tokens ?? 0 };
+        }
+      } catch { /* skip */ }
+    }
+  }
+}
+
+// ── Main chat route ───────────────────────────────────────────────────────────
 router.post("/chat", async (req, res) => {
   try {
     const { messages, language } = req.body as {
-      messages?: Array<{ role: "user" | "assistant"; content: string }>;
+      messages?: ChatMsg[];
       language?: string;
     };
 
@@ -208,47 +360,25 @@ router.post("/chat", async (req, res) => {
       return;
     }
 
-    const apiKey = process.env.AI_INTEGRATIONS_OPENAI_API_KEY || process.env.ANTHROPIC_API_KEY;
-    if (!apiKey) {
-      res.status(500).json({ error: "AI not configured" });
-      return;
-    }
-
-    // Fetch live knowledge base and possible order info in parallel
-    const lastUserMessage = [...messages].reverse().find(m => m.role === "user")?.content ?? "";
-    const [knowledgeBase, orderInfo] = await Promise.all([
+    const [aiSettings, knowledgeBase] = await Promise.all([
+      getAISettings(),
       getLiveKnowledgeBase(),
-      lookupOrderFromMessage(lastUserMessage),
     ]);
 
-    const systemPrompt = [
-      BASE_SYSTEM_PROMPT,
-      "\n",
-      knowledgeBase,
-      orderInfo ? `\n\n${orderInfo}` : "",
-    ].join("\n");
+    const lastUserMsg = [...messages].reverse().find((m) => m.role === "user")?.content ?? "";
+    const orderInfo = await lookupOrderFromMessage(lastUserMsg);
 
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify({
-        model: "claude-haiku-4-20250514",
-        max_tokens: 600,
-        system: systemPrompt,
-        messages: messages
-          .filter(m => m.content.trim() !== "")
-          .map(m => ({ role: m.role, content: m.content })),
-        stream: true,
-      }),
-    });
+    const systemPrompt = [BASE_SYSTEM, "\n", knowledgeBase, orderInfo ? `\n\n${orderInfo}` : ""].join("\n");
 
-    if (!response.ok || !response.body) {
-      req.log.error({ status: response.status }, "Anthropic request failed");
-      res.status(502).json({ error: "AI response failed" });
+    const { provider, geminiApiKey, openaiApiKey, anthropicApiKey } = aiSettings;
+
+    let apiKey = "";
+    if (provider === "gemini") apiKey = geminiApiKey;
+    else if (provider === "openai") apiKey = openaiApiKey;
+    else apiKey = anthropicApiKey;
+
+    if (!apiKey) {
+      res.status(503).json({ error: `No API key configured for provider: ${provider}` });
       return;
     }
 
@@ -256,40 +386,45 @@ router.post("/chat", async (req, res) => {
     res.setHeader("Cache-Control", "no-cache");
     res.setHeader("Connection", "keep-alive");
 
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
+    let tokensIn = 0;
+    let tokensOut = 0;
+    let modelName = provider === "gemini" ? "gemini-2.0-flash" : provider === "openai" ? "gpt-4o-mini" : "claude-haiku-4-5";
 
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
+    const stream =
+      provider === "gemini"
+        ? streamGemini(apiKey, systemPrompt, messages)
+        : provider === "openai"
+        ? streamOpenAI(apiKey, systemPrompt, messages)
+        : streamAnthropic(apiKey, systemPrompt, messages);
 
-      const chunk = decoder.decode(value, { stream: true });
-      const lines = chunk.split("\n");
-      for (const line of lines) {
-        if (!line.startsWith("data: ")) continue;
-        const payload = line.slice(6).trim();
-        if (payload === "[DONE]") continue;
-        try {
-          const event = JSON.parse(payload) as {
-            type?: string;
-            delta?: { type?: string; text?: string };
-          };
-          if (event.type === "content_block_delta" && event.delta?.type === "text_delta" && event.delta.text) {
-            res.write(`data: ${JSON.stringify({ content: event.delta.text })}\n\n`);
-          }
-        } catch {
-          // skip malformed chunks
-        }
+    for await (const chunk of stream) {
+      if (chunk.text) {
+        res.write(`data: ${JSON.stringify({ content: chunk.text })}\n\n`);
       }
+      if (chunk.tokensIn !== undefined) tokensIn = chunk.tokensIn;
+      if (chunk.tokensOut !== undefined) tokensOut = chunk.tokensOut;
     }
 
     res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
     res.end();
+
+    // Log usage (non-blocking)
+    const total = tokensIn + tokensOut || Math.ceil((systemPrompt.length + lastUserMsg.length) / 4);
+    const sessionId = (req.session as any)?.id || req.headers["x-session-id"] as string || "anonymous";
+    db.insert(aiUsageLogsTable)
+      .values({
+        provider,
+        model: modelName,
+        sessionId,
+        userMessage: lastUserMsg.slice(0, 200),
+        tokensIn: tokensIn || Math.ceil(systemPrompt.length / 4),
+        tokensOut: tokensOut || Math.ceil(total * 0.3),
+        totalTokens: total,
+      })
+      .catch(() => {});
   } catch (error) {
     req.log.error(error, "Chat error");
-    if (!res.headersSent) {
-      res.status(500).json({ error: "Something went wrong" });
-    }
+    if (!res.headersSent) res.status(500).json({ error: "Something went wrong" });
   }
 });
 

@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
-import { Save, Upload, Instagram, Facebook, Store, Smartphone, Globe, Phone, MessageCircle } from "lucide-react";
+import { Save, Upload, Instagram, Facebook, Store, Smartphone, Globe, Phone, MessageCircle, Bot, Eye, EyeOff, CheckCircle2 } from "lucide-react";
 
 async function uploadImage(file: File): Promise<string> {
   const fd = new FormData();
@@ -96,6 +96,13 @@ export default function AdminSettings() {
   const [passwordState, setPasswordState] = useState({
     oldPassword: "", newPassword: "", confirmPassword: "",
   });
+  const [aiSettings, setAiSettings] = useState({
+    aiProvider: "anthropic" as "gemini" | "openai" | "anthropic",
+    geminiApiKey: "",
+    openaiApiKey: "",
+    anthropicApiKey: "",
+  });
+  const [showKeys, setShowKeys] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     if (settings) {
@@ -122,6 +129,12 @@ export default function AdminSettings() {
         freeShippingThreshold: (settings as any).freeShippingThreshold?.toString() || "3000",
         currency: "PKR",
       });
+      setAiSettings({
+        aiProvider: (settings as any).aiProvider || "anthropic",
+        geminiApiKey: (settings as any).geminiApiKey || "",
+        openaiApiKey: (settings as any).openaiApiKey || "",
+        anthropicApiKey: (settings as any).anthropicApiKey || "",
+      });
     }
   }, [settings]);
 
@@ -143,11 +156,14 @@ export default function AdminSettings() {
 
       <div className="max-w-3xl space-y-8">
         <Tabs defaultValue="store-info">
-          <TabsList className="grid w-full grid-cols-4 mb-6 h-11">
+          <TabsList className="grid w-full grid-cols-5 mb-6 h-11">
             <TabsTrigger value="store-info" className="font-display uppercase tracking-wider text-xs">Store Info</TabsTrigger>
             <TabsTrigger value="social" className="font-display uppercase tracking-wider text-xs">Social</TabsTrigger>
             <TabsTrigger value="app-links" className="font-display uppercase tracking-wider text-xs">App Links</TabsTrigger>
             <TabsTrigger value="shipping" className="font-display uppercase tracking-wider text-xs">Shipping</TabsTrigger>
+            <TabsTrigger value="ai" className="font-display uppercase tracking-wider text-xs flex items-center gap-1">
+              <Bot className="w-3 h-3" /> AI
+            </TabsTrigger>
           </TabsList>
 
           {/* Store Info Tab */}
@@ -307,7 +323,7 @@ export default function AdminSettings() {
           {/* App Links Tab */}
           <TabsContent value="app-links">
             <Card>
-              <form onSubmit={(e) => { e.preventDefault(); updateSettings.mutate({ data: appLinks }); }}>
+              <form onSubmit={(e) => { e.preventDefault(); updateSettings.mutate({ data: appLinks as any }); }}>
                 <CardHeader>
                   <CardTitle className="font-display uppercase tracking-wider text-lg flex items-center gap-2">
                     <Smartphone className="w-5 h-5 text-accent" /> Mobile App Links
@@ -414,6 +430,103 @@ export default function AdminSettings() {
                 <CardFooter className="border-t px-6 py-4">
                   <Button type="submit" disabled={updateSettings.isPending} className="font-display uppercase tracking-wider">
                     <Save className="w-4 h-4 mr-2" /> Save Changes
+                  </Button>
+                </CardFooter>
+              </form>
+            </Card>
+          </TabsContent>
+          {/* AI Settings Tab */}
+          <TabsContent value="ai">
+            <Card>
+              <form onSubmit={(e) => { e.preventDefault(); updateSettings.mutate({ data: aiSettings as any }); }}>
+                <CardHeader>
+                  <CardTitle className="font-display uppercase tracking-wider text-lg flex items-center gap-2">
+                    <Bot className="w-5 h-5 text-accent" /> AI Chatbot Settings
+                  </CardTitle>
+                  <CardDescription>
+                    NanoBot ke liye AI provider aur API key set karein. Keys sirf admin panel mein safe rakhi jaati hain.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* Provider Selector */}
+                  <div className="space-y-3">
+                    <p className="font-bold uppercase tracking-wider text-xs text-muted-foreground">Active AI Provider</p>
+                    <div className="grid grid-cols-3 gap-3">
+                      {[
+                        { id: "gemini", label: "Gemini 2.0 Flash", sub: "Google · Free tier", color: "bg-blue-500", badge: "FREE" },
+                        { id: "openai", label: "GPT-4o Mini", sub: "OpenAI · Cheapest", color: "bg-emerald-500", badge: "FAST" },
+                        { id: "anthropic", label: "Claude Haiku", sub: "Anthropic · Smart", color: "bg-orange-500", badge: "SMART" },
+                      ].map((p) => (
+                        <button
+                          key={p.id}
+                          type="button"
+                          onClick={() => setAiSettings({ ...aiSettings, aiProvider: p.id as any })}
+                          className={`relative p-4 rounded-xl border-2 text-left transition-all ${
+                            aiSettings.aiProvider === p.id
+                              ? "border-accent bg-accent/5"
+                              : "border-border hover:border-muted-foreground/30"
+                          }`}
+                        >
+                          <div className={`w-8 h-8 ${p.color} rounded-lg mb-3 flex items-center justify-center`}>
+                            <Bot className="w-4 h-4 text-white" />
+                          </div>
+                          <p className="font-bold text-sm leading-tight">{p.label}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">{p.sub}</p>
+                          <span className="absolute top-2 right-2 text-[9px] font-black tracking-wider bg-secondary px-1.5 py-0.5 rounded-md">{p.badge}</span>
+                          {aiSettings.aiProvider === p.id && (
+                            <CheckCircle2 className="absolute bottom-2 right-2 w-4 h-4 text-accent" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* API Keys */}
+                  {[
+                    { key: "geminiApiKey", label: "Google Gemini API Key", placeholder: "AIza...", help: "console.cloud.google.com se banayein ya aistudio.google.com", provider: "gemini" },
+                    { key: "openaiApiKey", label: "OpenAI API Key", placeholder: "sk-proj-...", help: "platform.openai.com/api-keys se banayein", provider: "openai" },
+                    { key: "anthropicApiKey", label: "Anthropic (Claude) API Key", placeholder: "sk-ant-...", help: "console.anthropic.com se banayein", provider: "anthropic" },
+                  ].map((field) => (
+                    <div key={field.key} className={`space-y-2 p-4 rounded-xl border transition-colors ${aiSettings.aiProvider === field.provider ? "border-accent/30 bg-accent/5" : "border-border"}`}>
+                      <Label className={`font-bold uppercase tracking-wider text-xs flex items-center gap-2 ${aiSettings.aiProvider === field.provider ? "text-foreground" : "text-muted-foreground"}`}>
+                        {aiSettings.aiProvider === field.provider && <CheckCircle2 className="w-3 h-3 text-accent" />}
+                        {field.label}
+                        {aiSettings.aiProvider === field.provider && (
+                          <span className="text-[9px] bg-accent text-white px-1.5 py-0.5 rounded font-black tracking-wider">ACTIVE</span>
+                        )}
+                      </Label>
+                      <div className="relative">
+                        <Input
+                          type={showKeys[field.key] ? "text" : "password"}
+                          value={(aiSettings as any)[field.key]}
+                          onChange={(e) => setAiSettings({ ...aiSettings, [field.key]: e.target.value })}
+                          placeholder={field.placeholder}
+                          className="pr-10 font-mono text-sm"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowKeys({ ...showKeys, [field.key]: !showKeys[field.key] })}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                        >
+                          {showKeys[field.key] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                      <p className="text-xs text-muted-foreground">{field.help}</p>
+                      {(aiSettings as any)[field.key] && (
+                        <p className="text-xs text-emerald-600 font-bold">✓ Key saved</p>
+                      )}
+                    </div>
+                  ))}
+
+                  <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800">
+                    <p className="font-bold mb-1">Cost Estimates (per 1,000 messages approx):</p>
+                    <p>🔵 Gemini 2.0 Flash — $0.05–0.10 | 🟢 GPT-4o Mini — $0.10–0.20 | 🟠 Claude Haiku — $0.15–0.30</p>
+                    <p className="mt-1 text-amber-700">Usage details: Admin → AI Usage page mein dekhein</p>
+                  </div>
+                </CardContent>
+                <CardFooter className="border-t px-6 py-4">
+                  <Button type="submit" disabled={updateSettings.isPending} className="font-display uppercase tracking-wider">
+                    <Save className="w-4 h-4 mr-2" /> Save AI Settings
                   </Button>
                 </CardFooter>
               </form>
