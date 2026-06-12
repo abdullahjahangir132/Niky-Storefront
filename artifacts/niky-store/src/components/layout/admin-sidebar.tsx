@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { LayoutDashboard, ShoppingBag, ShoppingCart, Tags, Users, Ticket, Settings, LogOut, Bot } from "lucide-react";
+import { LayoutDashboard, ShoppingBag, ShoppingCart, Tags, Users, Ticket, Settings, LogOut, Bot, Palette } from "lucide-react";
 
 export function AdminSidebar() {
   const [location] = useLocation();
@@ -11,6 +11,7 @@ export function AdminSidebar() {
     { href: "/admin/customers", label: "Customers", icon: Users },
     { href: "/admin/categories", label: "Categories", icon: Tags },
     { href: "/admin/coupons", label: "Coupons", icon: Ticket },
+    { href: "/admin/themes", label: "Themes", icon: Palette },
     { href: "/admin/ai-usage", label: "AI Usage", icon: Bot },
     { href: "/admin/settings", label: "Settings", icon: Settings },
   ];

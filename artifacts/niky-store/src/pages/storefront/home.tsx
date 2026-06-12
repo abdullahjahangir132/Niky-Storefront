@@ -4,11 +4,15 @@ import { ArrowRight } from "lucide-react";
 import { useListProducts } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/utils";
+import { useTheme } from "@/components/providers/theme-provider";
 
 export default function Home() {
   const { data: featuredProducts } = useListProducts({ featured: true, limit: 4 });
   const { data: newArrivals } = useListProducts({ isNew: true, limit: 4 });
   const { data: saleProducts } = useListProducts({ onSale: true, limit: 4 });
+  const { settings } = useTheme();
+
+  const heroImage = settings.heroImageUrl || "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=1600&q=80";
 
   return (
     <>
@@ -16,7 +20,7 @@ export default function Home() {
       <section className="relative h-screen min-h-[600px] w-full overflow-hidden bg-black flex items-center justify-center -mt-20">
         <div className="absolute inset-0 z-0">
           <img
-            src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=1600&q=80"
+            src={heroImage}
             alt="Hero"
             className="w-full h-full object-cover opacity-60"
             loading="eager"

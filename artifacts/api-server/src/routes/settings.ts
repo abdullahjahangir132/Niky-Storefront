@@ -4,6 +4,10 @@ import { settingsTable } from "@workspace/db";
 
 const router = Router();
 
+const DEFAULT_THEME_1 = JSON.stringify({ name: "Stealth Black", bg: "#0a0a0a", accent: "#c8102e", highlight: "#ffffff" });
+const DEFAULT_THEME_2 = JSON.stringify({ name: "Midnight Navy", bg: "#0d1b2a", accent: "#d4af37", highlight: "#ffffff" });
+const DEFAULT_THEME_3 = JSON.stringify({ name: "Forest Elite", bg: "#0d1a10", accent: "#ff3355", highlight: "#ffffff" });
+
 const DEFAULT_SETTINGS = {
   storeName: "Nano Shoes",
   tagline: "Move Beyond Limits",
@@ -25,11 +29,16 @@ const DEFAULT_SETTINGS = {
   cardEnabled: true,
   easypaisaEnabled: true,
   jazzcashEnabled: true,
-  // AI provider settings
   aiProvider: "anthropic",
   geminiApiKey: "",
   openaiApiKey: "",
   anthropicApiKey: "",
+  // Theme settings
+  activeTheme: "1",
+  heroImageUrl: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=1600&q=80",
+  theme1: DEFAULT_THEME_1,
+  theme2: DEFAULT_THEME_2,
+  theme3: DEFAULT_THEME_3,
 };
 
 type SettingsType = typeof DEFAULT_SETTINGS;
@@ -64,8 +73,27 @@ async function getAllSettings(): Promise<SettingsType> {
     cardEnabled: map.cardEnabled !== undefined ? map.cardEnabled === "true" : DEFAULT_SETTINGS.cardEnabled,
     easypaisaEnabled: map.easypaisaEnabled !== undefined ? map.easypaisaEnabled === "true" : DEFAULT_SETTINGS.easypaisaEnabled,
     jazzcashEnabled: map.jazzcashEnabled !== undefined ? map.jazzcashEnabled === "true" : DEFAULT_SETTINGS.jazzcashEnabled,
+    activeTheme: map.activeTheme ?? DEFAULT_SETTINGS.activeTheme,
+    heroImageUrl: map.heroImageUrl ?? DEFAULT_SETTINGS.heroImageUrl,
+    theme1: map.theme1 ?? DEFAULT_SETTINGS.theme1,
+    theme2: map.theme2 ?? DEFAULT_SETTINGS.theme2,
+    theme3: map.theme3 ?? DEFAULT_SETTINGS.theme3,
   };
 }
+
+// GET /api/settings/public — returns only display-safe settings (no API keys)
+router.get("/settings/public", async (_req, res) => {
+  const all = await getAllSettings();
+  res.json({
+    storeName: all.storeName,
+    tagline: all.tagline,
+    activeTheme: all.activeTheme,
+    heroImageUrl: all.heroImageUrl,
+    theme1: all.theme1,
+    theme2: all.theme2,
+    theme3: all.theme3,
+  });
+});
 
 // GET /api/admin/settings
 router.get("/admin/settings", async (_req, res) => {
