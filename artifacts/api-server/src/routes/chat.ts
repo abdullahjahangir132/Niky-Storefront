@@ -532,17 +532,18 @@ router.post("/chat", async (req, res) => {
     res.setHeader("Content-Type", "text/event-stream");
     res.setHeader("Cache-Control", "no-cache");
     res.setHeader("Connection", "keep-alive");
+    res.setHeader("X-Accel-Buffering", "no"); // disable nginx/proxy buffering for SSE
 
-    // ── NO API KEY → use rule-based knowledge-base answers ──
+    // ── NO API KEY → return rule-based answer as plain JSON (no SSE needed) ──
     if (!apiKey) {
       const answer = await buildKbAnswer(lastUserMsg, kb, order);
-      for await (const chunk of streamText(answer)) {
-        res.write(`data: ${JSON.stringify({ content: chunk })}\n\n`);
-      }
-      res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
-      res.end();
+      // Return as plain JSON — frontend handles both SSE and JSON responses
+      res.removeHeader("Content-Type");
+      res.removeHeader("Cache-Control");
+      res.removeHeader("Connection");
+      res.removeHeader("X-Accel-Buffering");
+      res.json({ content: answer, done: true });
 
-      // Log as KB answer (no tokens)
       const sessionId = (req.session as any)?.id || req.headers["x-session-id"] as string || "anonymous";
       db.insert(aiUsageLogsTable).values({
         provider: "kb_fallback", model: "rule-based", sessionId,
@@ -564,7 +565,10 @@ router.post("/chat", async (req, res) => {
 
     let tokensIn = 0, tokensOut = 0;
     for await (const chunk of stream) {
-      if (chunk.text) res.write(`data: ${JSON.stringify({ content: chunk.text })}\n\n`);
+      if (chunk.text) {
+        res.write(`data: ${JSON.stringify({ content: chunk.text })}\n\n`);
+        if (typeof (res as any).flush === "function") (res as any).flush();
+      }
       if (chunk.tokensIn !== undefined) tokensIn = chunk.tokensIn;
       if (chunk.tokensOut !== undefined) tokensOut = chunk.tokensOut;
     }

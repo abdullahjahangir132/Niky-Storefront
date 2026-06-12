@@ -4,6 +4,105 @@ import { ArrowUp, MessageCircle, X, Bot } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
+// ── Simple markdown renderer ─────────────────────────────────────────────────
+function renderInline(text: string): React.ReactNode[] {
+  const parts: React.ReactNode[] = [];
+  const regex = /\*\*(.+?)\*\*/g;
+  let last = 0, m: RegExpExecArray | null;
+  while ((m = regex.exec(text)) !== null) {
+    if (m.index > last) parts.push(text.slice(last, m.index));
+    parts.push(<strong key={m.index} className="font-bold">{m[1]}</strong>);
+    last = regex.lastIndex;
+  }
+  if (last < text.length) parts.push(text.slice(last));
+  return parts;
+}
+
+function MsgContent({ text }: { text: string }) {
+  if (!text) return null;
+  const lines = text.split("\n");
+  const nodes: React.ReactNode[] = [];
+  let i = 0;
+
+  while (i < lines.length) {
+    const line = lines[i];
+
+    // Table: lines starting with |
+    if (line.trim().startsWith("|")) {
+      const tableLines: string[] = [];
+      while (i < lines.length && lines[i].trim().startsWith("|")) {
+        tableLines.push(lines[i]);
+        i++;
+      }
+      const rows = tableLines
+        .filter(l => !l.match(/^\s*\|[-| :]+\|\s*$/)) // skip separator rows
+        .map(l => l.split("|").filter((_, idx, arr) => idx > 0 && idx < arr.length - 1).map(c => c.trim()));
+      if (rows.length > 0) {
+        nodes.push(
+          <div key={`table-${i}`} className="overflow-x-auto my-1">
+            <table className="text-xs border-collapse w-full">
+              <thead>
+                <tr className="bg-zinc-100">
+                  {rows[0].map((h, j) => (
+                    <th key={j} className="border border-zinc-200 px-2 py-1 text-left font-bold">{renderInline(h)}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {rows.slice(1).map((row, r) => (
+                  <tr key={r} className={r % 2 === 0 ? "" : "bg-zinc-50"}>
+                    {row.map((cell, j) => (
+                      <td key={j} className="border border-zinc-200 px-2 py-1">{renderInline(cell)}</td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        );
+      }
+      continue;
+    }
+
+    // Empty line → spacer
+    if (line.trim() === "") {
+      nodes.push(<div key={`sp-${i}`} className="h-1" />);
+      i++;
+      continue;
+    }
+
+    // Bullet: starts with • or -
+    if (line.trim().match(/^[•\-]\s/)) {
+      const bullets: string[] = [];
+      while (i < lines.length && lines[i].trim().match(/^[•\-]\s/)) {
+        bullets.push(lines[i].trim().replace(/^[•\-]\s/, ""));
+        i++;
+      }
+      nodes.push(
+        <ul key={`ul-${i}`} className="my-1 space-y-0.5 pl-3">
+          {bullets.map((b, j) => (
+            <li key={j} className="flex gap-2 text-sm">
+              <span className="text-accent mt-0.5 flex-shrink-0">•</span>
+              <span>{renderInline(b)}</span>
+            </li>
+          ))}
+        </ul>
+      );
+      continue;
+    }
+
+    // Normal line
+    nodes.push(
+      <p key={`p-${i}`} className="text-sm leading-relaxed">
+        {renderInline(line)}
+      </p>
+    );
+    i++;
+  }
+
+  return <div className="space-y-0.5">{nodes}</div>;
+}
+
 type Language = "en" | "rur" | "ar" | "ur";
 type Role = "user" | "assistant";
 
@@ -142,8 +241,25 @@ export function NanoBotWidget() {
         body: JSON.stringify({ language, messages: nextMessages }),
       });
 
-      if (!res.ok || !res.body) throw new Error("Request failed");
+      if (!res.ok) throw new Error("Request failed");
 
+      const contentType = res.headers.get("Content-Type") ?? "";
+
+      // ── Plain JSON response (no API key — knowledge-base mode) ──
+      if (contentType.includes("application/json")) {
+        const data = await res.json() as { content?: string; done?: boolean };
+        if (data.content) {
+          setMessages(prev => {
+            const next = [...prev];
+            next[next.length - 1] = { ...next[next.length - 1], content: data.content! };
+            return next;
+          });
+        }
+        return;
+      }
+
+      // ── SSE streaming response (API key configured) ──
+      if (!res.body) throw new Error("No body");
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let buffer = "";
@@ -247,15 +363,16 @@ export function NanoBotWidget() {
                       <div className="mt-1 h-7 w-7 rounded-full bg-accent flex-shrink-0 flex items-center justify-center">
                         <Bot className="h-3.5 w-3.5 text-white" />
                       </div>
-                      <div className="whitespace-pre-wrap rounded-2xl rounded-tl-sm bg-white border border-zinc-100 px-4 py-3 text-sm leading-[1.65] text-zinc-800 shadow-sm">
-                        {message.content}
-                        {loading && index === messages.length - 1 && message.content === "" && (
-                          <span className="inline-flex items-center gap-1 ml-1 align-middle">
-                            <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-zinc-400" />
-                            <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-zinc-400 [animation-delay:120ms]" />
-                            <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-zinc-400 [animation-delay:240ms]" />
+                      <div className="rounded-2xl rounded-tl-sm bg-white border border-zinc-200 px-4 py-3 text-zinc-800 shadow-sm min-h-[2.5rem]">
+                        {message.content ? (
+                          <MsgContent text={message.content} />
+                        ) : loading && index === messages.length - 1 ? (
+                          <span className="inline-flex items-center gap-1 align-middle h-5">
+                            <span className="h-2 w-2 animate-bounce rounded-full bg-zinc-400" />
+                            <span className="h-2 w-2 animate-bounce rounded-full bg-zinc-400 [animation-delay:120ms]" />
+                            <span className="h-2 w-2 animate-bounce rounded-full bg-zinc-400 [animation-delay:240ms]" />
                           </span>
-                        )}
+                        ) : null}
                       </div>
                     </div>
                   ) : (
