@@ -4,70 +4,17 @@ import { ArrowRight } from "lucide-react";
 import { useListProducts } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/utils";
-import { useTheme } from "@/components/providers/theme-provider";
+import HeroCarousel from "@/components/storefront/hero-carousel";
 
 export default function Home() {
   const { data: featuredProducts } = useListProducts({ featured: true, limit: 4 });
   const { data: newArrivals } = useListProducts({ isNew: true, limit: 4 });
   const { data: saleProducts } = useListProducts({ onSale: true, limit: 4 });
-  const { settings } = useTheme();
-
-  const heroImage = settings.heroImageUrl || "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=1600&q=80";
 
   return (
     <>
       {/* Hero Section */}
-      <section className="relative h-screen min-h-[600px] w-full overflow-hidden bg-black flex items-center justify-center -mt-20">
-        <div className="absolute inset-0 z-0">
-          <img
-            src={heroImage}
-            alt="Hero"
-            className="w-full h-full object-cover opacity-60"
-            loading="eager"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-black/40" />
-        </div>
-
-        <div className="relative z-10 text-center px-4 max-w-5xl mx-auto">
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-accent font-bold uppercase tracking-[0.3em] text-sm mb-4"
-          >
-            Pakistan's Premium Footwear
-          </motion.p>
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="font-display font-black text-6xl md:text-8xl lg:text-[10rem] text-white uppercase tracking-tighter leading-none mb-6"
-          >
-            Move<br /><span className="text-accent">Beyond</span><br />Limits
-          </motion.h1>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8"
-          >
-            <Link href="/shop">
-              <Button size="lg" className="h-14 px-10 rounded-full font-display text-lg uppercase tracking-wider w-full sm:w-auto">
-                Shop Now
-              </Button>
-            </Link>
-            <Link href="/shop?onSale=true">
-              <Button size="lg" variant="outline" className="h-14 px-10 rounded-full font-display text-lg uppercase tracking-wider text-white border-white hover:bg-white hover:text-black w-full sm:w-auto bg-transparent">
-                Sale Items
-              </Button>
-            </Link>
-          </motion.div>
-        </div>
-
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/40">
-          <div className="w-px h-12 bg-white/20 animate-pulse" />
-        </div>
-      </section>
+      <HeroCarousel />
 
       {/* Brand Lines Marquee */}
       <section className="border-y border-border py-4 overflow-hidden bg-secondary/10">

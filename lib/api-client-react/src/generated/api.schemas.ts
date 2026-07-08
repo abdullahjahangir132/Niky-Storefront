@@ -179,6 +179,81 @@ export interface Category {
   createdAt: string;
 }
 
+export type HeroSlideMediaType =
+  (typeof HeroSlideMediaType)[keyof typeof HeroSlideMediaType];
+
+export const HeroSlideMediaType = {
+  image: "image",
+  video: "video",
+} as const;
+
+export interface HeroSlide {
+  id: number;
+  mediaType: HeroSlideMediaType;
+  imageUrl: string;
+  imageUrl2: string;
+  videoUrl: string;
+  title: string;
+  subtitle: string;
+  ctaText: string;
+  ctaLink: string;
+  secondaryCtaText: string;
+  secondaryCtaLink: string;
+  sortOrder: number;
+  isActive: boolean;
+  createdAt: string;
+}
+
+export type CreateHeroSlideBodyMediaType =
+  (typeof CreateHeroSlideBodyMediaType)[keyof typeof CreateHeroSlideBodyMediaType];
+
+export const CreateHeroSlideBodyMediaType = {
+  image: "image",
+  video: "video",
+} as const;
+
+export interface CreateHeroSlideBody {
+  mediaType: CreateHeroSlideBodyMediaType;
+  imageUrl?: string;
+  imageUrl2?: string;
+  videoUrl?: string;
+  title?: string;
+  subtitle?: string;
+  ctaText?: string;
+  ctaLink?: string;
+  secondaryCtaText?: string;
+  secondaryCtaLink?: string;
+  sortOrder?: number;
+  isActive?: boolean;
+}
+
+export type UpdateHeroSlideBodyMediaType =
+  (typeof UpdateHeroSlideBodyMediaType)[keyof typeof UpdateHeroSlideBodyMediaType];
+
+export const UpdateHeroSlideBodyMediaType = {
+  image: "image",
+  video: "video",
+} as const;
+
+export interface UpdateHeroSlideBody {
+  mediaType?: UpdateHeroSlideBodyMediaType;
+  imageUrl?: string;
+  imageUrl2?: string;
+  videoUrl?: string;
+  title?: string;
+  subtitle?: string;
+  ctaText?: string;
+  ctaLink?: string;
+  secondaryCtaText?: string;
+  secondaryCtaLink?: string;
+  sortOrder?: number;
+  isActive?: boolean;
+}
+
+export interface SearchSuggestions {
+  terms: string[];
+}
+
 export interface CreateCategoryBody {
   name: string;
   slug?: string;

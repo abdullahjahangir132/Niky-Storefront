@@ -21,6 +21,8 @@ tags:
   - name: users
   - name: wishlist
   - name: reviews
+  - name: hero-slides
+  - name: search
 
 paths:
   /healthz:
@@ -527,6 +529,108 @@ paths:
       responses:
         "200":
           description: Deleted
+
+  # ─── Hero Slides ────────────────────────────────────────────────────────────
+  /hero-slides:
+    get:
+      operationId: listHeroSlides
+      tags: [hero-slides]
+      summary: List active hero slides (storefront)
+      responses:
+        "200":
+          description: Active hero slides, ordered
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/HeroSlide"
+
+  /admin/hero-slides:
+    get:
+      operationId: listAdminHeroSlides
+      tags: [hero-slides]
+      summary: List all hero slides (admin)
+      responses:
+        "200":
+          description: All hero slides, ordered
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/HeroSlide"
+
+    post:
+      operationId: createHeroSlide
+      tags: [hero-slides]
+      summary: Create a hero slide (admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateHeroSlideBody"
+      responses:
+        "201":
+          description: Hero slide created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HeroSlide"
+
+  /admin/hero-slides/{id}:
+    put:
+      operationId: updateHeroSlide
+      tags: [hero-slides]
+      summary: Update a hero slide (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateHeroSlideBody"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HeroSlide"
+
+    delete:
+      operationId: deleteHeroSlide
+      tags: [hero-slides]
+      summary: Delete a hero slide (admin)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Deleted
+
+  # ─── Search ────────────────────────────────────────────────────────────────
+  /search-suggestions:
+    get:
+      operationId: getSearchSuggestions
+      tags: [search]
+      summary: Popular search terms derived from product data
+      responses:
+        "200":
+          description: Popular search terms
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchSuggestions"
 
   # ─── Cart ─────────────────────────────────────────────────────────────────────
   /cart:
@@ -1373,6 +1477,124 @@ components:
         createdAt:
           type: string
       required: [id, name, slug, description, imageUrl, productCount, createdAt]
+
+    HeroSlide:
+      type: object
+      properties:
+        id:
+          type: integer
+        mediaType:
+          type: string
+          enum: [image, video]
+        imageUrl:
+          type: string
+        imageUrl2:
+          type: string
+        videoUrl:
+          type: string
+        title:
+          type: string
+        subtitle:
+          type: string
+        ctaText:
+          type: string
+        ctaLink:
+          type: string
+        secondaryCtaText:
+          type: string
+        secondaryCtaLink:
+          type: string
+        sortOrder:
+          type: integer
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+      required:
+        [
+          id,
+          mediaType,
+          imageUrl,
+          imageUrl2,
+          videoUrl,
+          title,
+          subtitle,
+          ctaText,
+          ctaLink,
+          secondaryCtaText,
+          secondaryCtaLink,
+          sortOrder,
+          isActive,
+          createdAt,
+        ]
+
+    CreateHeroSlideBody:
+      type: object
+      properties:
+        mediaType:
+          type: string
+          enum: [image, video]
+        imageUrl:
+          type: string
+        imageUrl2:
+          type: string
+        videoUrl:
+          type: string
+        title:
+          type: string
+        subtitle:
+          type: string
+        ctaText:
+          type: string
+        ctaLink:
+          type: string
+        secondaryCtaText:
+          type: string
+        secondaryCtaLink:
+          type: string
+        sortOrder:
+          type: integer
+        isActive:
+          type: boolean
+      required: [mediaType]
+
+    UpdateHeroSlideBody:
+      type: object
+      properties:
+        mediaType:
+          type: string
+          enum: [image, video]
+        imageUrl:
+          type: string
+        imageUrl2:
+          type: string
+        videoUrl:
+          type: string
+        title:
+          type: string
+        subtitle:
+          type: string
+        ctaText:
+          type: string
+        ctaLink:
+          type: string
+        secondaryCtaText:
+          type: string
+        secondaryCtaLink:
+          type: string
+        sortOrder:
+          type: integer
+        isActive:
+          type: boolean
+
+    SearchSuggestions:
+      type: object
+      properties:
+        terms:
+          type: array
+          items:
+            type: string
+      required: [terms]
 
     CreateCategoryBody:
       type: object

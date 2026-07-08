@@ -16,6 +16,8 @@ import chatRouter from "./chat";
 import aiUsageRouter from "./ai-usage";
 import uploadRouter from "./upload";
 import navMenuRouter from "./nav-menu";
+import heroSlidesRouter from "./hero-slides";
+import searchRouter from "./search";
 
 const router: IRouter = Router();
 
@@ -36,5 +38,7 @@ router.use(chatRouter);
 router.use(aiUsageRouter);
 router.use(uploadRouter);
 router.use(navMenuRouter);
+router.use(heroSlidesRouter);
+router.use(searchRouter);
 
 export default router;

@@ -29,6 +29,7 @@ import type {
   CouponValidation,
   CreateCategoryBody,
   CreateCouponBody,
+  CreateHeroSlideBody,
   CreateOrderBody,
   CreateProductBody,
   CreateReviewBody,
@@ -39,6 +40,7 @@ import type {
   GetTopProductsParams,
   GetWishlist200,
   HealthStatus,
+  HeroSlide,
   ListCustomersParams,
   ListOrdersParams,
   ListProductReviews200,
@@ -51,12 +53,14 @@ import type {
   ProductList,
   RegisterBody,
   Review,
+  SearchSuggestions,
   StoreSettings,
   TopProduct,
   TrackOrderBody,
   UpdateCartItemBody,
   UpdateCategoryBody,
   UpdateCouponBody,
+  UpdateHeroSlideBody,
   UpdateOrderStatusBody,
   UpdateProductBody,
   UpdateProfileBody,
@@ -2147,6 +2151,488 @@ export const useDeleteCategory = <
 > => {
   return useMutation(getDeleteCategoryMutationOptions(options));
 };
+
+/**
+ * @summary List active hero slides (storefront)
+ */
+export const getListHeroSlidesUrl = () => {
+  return `/api/hero-slides`;
+};
+
+export const listHeroSlides = async (
+  options?: RequestInit,
+): Promise<HeroSlide[]> => {
+  return customFetch<HeroSlide[]>(getListHeroSlidesUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getListHeroSlidesQueryKey = () => {
+  return [`/api/hero-slides`] as const;
+};
+
+export const getListHeroSlidesQueryOptions = <
+  TData = Awaited<ReturnType<typeof listHeroSlides>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof listHeroSlides>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getListHeroSlidesQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof listHeroSlides>>> = ({
+    signal,
+  }) => listHeroSlides({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listHeroSlides>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ListHeroSlidesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listHeroSlides>>
+>;
+export type ListHeroSlidesQueryError = ErrorType<unknown>;
+
+/**
+ * @summary List active hero slides (storefront)
+ */
+
+export function useListHeroSlides<
+  TData = Awaited<ReturnType<typeof listHeroSlides>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof listHeroSlides>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getListHeroSlidesQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary List all hero slides (admin)
+ */
+export const getListAdminHeroSlidesUrl = () => {
+  return `/api/admin/hero-slides`;
+};
+
+export const listAdminHeroSlides = async (
+  options?: RequestInit,
+): Promise<HeroSlide[]> => {
+  return customFetch<HeroSlide[]>(getListAdminHeroSlidesUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getListAdminHeroSlidesQueryKey = () => {
+  return [`/api/admin/hero-slides`] as const;
+};
+
+export const getListAdminHeroSlidesQueryOptions = <
+  TData = Awaited<ReturnType<typeof listAdminHeroSlides>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof listAdminHeroSlides>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getListAdminHeroSlidesQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listAdminHeroSlides>>
+  > = ({ signal }) => listAdminHeroSlides({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listAdminHeroSlides>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ListAdminHeroSlidesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listAdminHeroSlides>>
+>;
+export type ListAdminHeroSlidesQueryError = ErrorType<unknown>;
+
+/**
+ * @summary List all hero slides (admin)
+ */
+
+export function useListAdminHeroSlides<
+  TData = Awaited<ReturnType<typeof listAdminHeroSlides>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof listAdminHeroSlides>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getListAdminHeroSlidesQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Create a hero slide (admin)
+ */
+export const getCreateHeroSlideUrl = () => {
+  return `/api/admin/hero-slides`;
+};
+
+export const createHeroSlide = async (
+  createHeroSlideBody: CreateHeroSlideBody,
+  options?: RequestInit,
+): Promise<HeroSlide> => {
+  return customFetch<HeroSlide>(getCreateHeroSlideUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(createHeroSlideBody),
+  });
+};
+
+export const getCreateHeroSlideMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createHeroSlide>>,
+    TError,
+    { data: BodyType<CreateHeroSlideBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createHeroSlide>>,
+  TError,
+  { data: BodyType<CreateHeroSlideBody> },
+  TContext
+> => {
+  const mutationKey = ["createHeroSlide"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createHeroSlide>>,
+    { data: BodyType<CreateHeroSlideBody> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createHeroSlide(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateHeroSlideMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createHeroSlide>>
+>;
+export type CreateHeroSlideMutationBody = BodyType<CreateHeroSlideBody>;
+export type CreateHeroSlideMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Create a hero slide (admin)
+ */
+export const useCreateHeroSlide = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createHeroSlide>>,
+    TError,
+    { data: BodyType<CreateHeroSlideBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof createHeroSlide>>,
+  TError,
+  { data: BodyType<CreateHeroSlideBody> },
+  TContext
+> => {
+  return useMutation(getCreateHeroSlideMutationOptions(options));
+};
+
+/**
+ * @summary Update a hero slide (admin)
+ */
+export const getUpdateHeroSlideUrl = (id: number) => {
+  return `/api/admin/hero-slides/${id}`;
+};
+
+export const updateHeroSlide = async (
+  id: number,
+  updateHeroSlideBody: UpdateHeroSlideBody,
+  options?: RequestInit,
+): Promise<HeroSlide> => {
+  return customFetch<HeroSlide>(getUpdateHeroSlideUrl(id), {
+    ...options,
+    method: "PUT",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(updateHeroSlideBody),
+  });
+};
+
+export const getUpdateHeroSlideMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateHeroSlide>>,
+    TError,
+    { id: number; data: BodyType<UpdateHeroSlideBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateHeroSlide>>,
+  TError,
+  { id: number; data: BodyType<UpdateHeroSlideBody> },
+  TContext
+> => {
+  const mutationKey = ["updateHeroSlide"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateHeroSlide>>,
+    { id: number; data: BodyType<UpdateHeroSlideBody> }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return updateHeroSlide(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateHeroSlideMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updateHeroSlide>>
+>;
+export type UpdateHeroSlideMutationBody = BodyType<UpdateHeroSlideBody>;
+export type UpdateHeroSlideMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Update a hero slide (admin)
+ */
+export const useUpdateHeroSlide = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateHeroSlide>>,
+    TError,
+    { id: number; data: BodyType<UpdateHeroSlideBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof updateHeroSlide>>,
+  TError,
+  { id: number; data: BodyType<UpdateHeroSlideBody> },
+  TContext
+> => {
+  return useMutation(getUpdateHeroSlideMutationOptions(options));
+};
+
+/**
+ * @summary Delete a hero slide (admin)
+ */
+export const getDeleteHeroSlideUrl = (id: number) => {
+  return `/api/admin/hero-slides/${id}`;
+};
+
+export const deleteHeroSlide = async (
+  id: number,
+  options?: RequestInit,
+): Promise<void> => {
+  return customFetch<void>(getDeleteHeroSlideUrl(id), {
+    ...options,
+    method: "DELETE",
+  });
+};
+
+export const getDeleteHeroSlideMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteHeroSlide>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteHeroSlide>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  const mutationKey = ["deleteHeroSlide"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteHeroSlide>>,
+    { id: number }
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return deleteHeroSlide(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteHeroSlideMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteHeroSlide>>
+>;
+
+export type DeleteHeroSlideMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Delete a hero slide (admin)
+ */
+export const useDeleteHeroSlide = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteHeroSlide>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof deleteHeroSlide>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  return useMutation(getDeleteHeroSlideMutationOptions(options));
+};
+
+/**
+ * @summary Popular search terms derived from product data
+ */
+export const getGetSearchSuggestionsUrl = () => {
+  return `/api/search-suggestions`;
+};
+
+export const getSearchSuggestions = async (
+  options?: RequestInit,
+): Promise<SearchSuggestions> => {
+  return customFetch<SearchSuggestions>(getGetSearchSuggestionsUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetSearchSuggestionsQueryKey = () => {
+  return [`/api/search-suggestions`] as const;
+};
+
+export const getGetSearchSuggestionsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getSearchSuggestions>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getSearchSuggestions>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetSearchSuggestionsQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getSearchSuggestions>>
+  > = ({ signal }) => getSearchSuggestions({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getSearchSuggestions>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetSearchSuggestionsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getSearchSuggestions>>
+>;
+export type GetSearchSuggestionsQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Popular search terms derived from product data
+ */
+
+export function useGetSearchSuggestions<
+  TData = Awaited<ReturnType<typeof getSearchSuggestions>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getSearchSuggestions>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetSearchSuggestionsQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
 
 /**
  * @summary Get cart items

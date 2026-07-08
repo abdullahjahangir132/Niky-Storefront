@@ -38,6 +38,7 @@ import AdminCoupons from "@/pages/admin/coupons/list";
 import AdminSettings from "@/pages/admin/settings/index";
 import AdminAiUsage from "@/pages/admin/ai-usage/index";
 import AdminThemes from "@/pages/admin/themes/index";
+import AdminHeroSlides from "@/pages/admin/hero-slides/index";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -81,6 +82,7 @@ function App() {
                     <Route path="/admin/coupons" component={() => <AdminWrapper component={AdminCoupons} />} />
                     <Route path="/admin/settings" component={() => <AdminWrapper component={AdminSettings} />} />
                     <Route path="/admin/themes" component={() => <AdminWrapper component={AdminThemes} />} />
+                    <Route path="/admin/hero-slides" component={() => <AdminWrapper component={AdminHeroSlides} />} />
                     <Route path="/admin/ai-usage" component={() => <AdminWrapper component={AdminAiUsage} />} />
                     <Route path="/admin" component={() => <AdminWrapper component={AdminDashboard} />} />
 

@@ -5,6 +5,7 @@ import { useUserAuth } from "@/hooks/use-user-auth";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { MegaMenuPanel, useNavMenu } from "./mega-menu";
+import SearchOverlay from "@/components/storefront/search-overlay";
 
 const MEGA_MENU_CATEGORIES = [
   { value: "men", label: "Men" },
@@ -18,6 +19,7 @@ export default function StoreNavbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [location] = useLocation();
   const navMenu = useNavMenu();
 
@@ -37,6 +39,7 @@ export default function StoreNavbar() {
   const megaMenuOpen = !!openMenu;
 
   return (
+    <>
     <header
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b border-transparent",
@@ -79,9 +82,13 @@ export default function StoreNavbar() {
         </nav>
 
         <div className="flex items-center gap-4 md:gap-6">
-          <Link href="/shop" className="text-foreground hover:text-accent transition-colors">
+          <button
+            aria-label="Search"
+            onClick={() => setSearchOpen(true)}
+            className="text-foreground hover:text-accent transition-colors"
+          >
             <Search size={20} />
-          </Link>
+          </button>
           <Link href="/account" className="text-foreground hover:text-accent transition-colors">
             <User size={20} />
           </Link>
@@ -118,5 +125,7 @@ export default function StoreNavbar() {
         </div>
       )}
     </header>
+      <SearchOverlay open={searchOpen} onClose={() => setSearchOpen(false)} />
+    </>
   );
 }

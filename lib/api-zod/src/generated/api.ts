@@ -532,6 +532,121 @@ export const DeleteCategoryParams = zod.object({
 });
 
 /**
+ * @summary List active hero slides (storefront)
+ */
+export const ListHeroSlidesResponseItem = zod.object({
+  id: zod.number(),
+  mediaType: zod.enum(["image", "video"]),
+  imageUrl: zod.string(),
+  imageUrl2: zod.string(),
+  videoUrl: zod.string(),
+  title: zod.string(),
+  subtitle: zod.string(),
+  ctaText: zod.string(),
+  ctaLink: zod.string(),
+  secondaryCtaText: zod.string(),
+  secondaryCtaLink: zod.string(),
+  sortOrder: zod.number(),
+  isActive: zod.boolean(),
+  createdAt: zod.string(),
+});
+export const ListHeroSlidesResponse = zod.array(ListHeroSlidesResponseItem);
+
+/**
+ * @summary List all hero slides (admin)
+ */
+export const ListAdminHeroSlidesResponseItem = zod.object({
+  id: zod.number(),
+  mediaType: zod.enum(["image", "video"]),
+  imageUrl: zod.string(),
+  imageUrl2: zod.string(),
+  videoUrl: zod.string(),
+  title: zod.string(),
+  subtitle: zod.string(),
+  ctaText: zod.string(),
+  ctaLink: zod.string(),
+  secondaryCtaText: zod.string(),
+  secondaryCtaLink: zod.string(),
+  sortOrder: zod.number(),
+  isActive: zod.boolean(),
+  createdAt: zod.string(),
+});
+export const ListAdminHeroSlidesResponse = zod.array(
+  ListAdminHeroSlidesResponseItem,
+);
+
+/**
+ * @summary Create a hero slide (admin)
+ */
+export const CreateHeroSlideBody = zod.object({
+  mediaType: zod.enum(["image", "video"]),
+  imageUrl: zod.string().optional(),
+  imageUrl2: zod.string().optional(),
+  videoUrl: zod.string().optional(),
+  title: zod.string().optional(),
+  subtitle: zod.string().optional(),
+  ctaText: zod.string().optional(),
+  ctaLink: zod.string().optional(),
+  secondaryCtaText: zod.string().optional(),
+  secondaryCtaLink: zod.string().optional(),
+  sortOrder: zod.number().optional(),
+  isActive: zod.boolean().optional(),
+});
+
+/**
+ * @summary Update a hero slide (admin)
+ */
+export const UpdateHeroSlideParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const UpdateHeroSlideBody = zod.object({
+  mediaType: zod.enum(["image", "video"]).optional(),
+  imageUrl: zod.string().optional(),
+  imageUrl2: zod.string().optional(),
+  videoUrl: zod.string().optional(),
+  title: zod.string().optional(),
+  subtitle: zod.string().optional(),
+  ctaText: zod.string().optional(),
+  ctaLink: zod.string().optional(),
+  secondaryCtaText: zod.string().optional(),
+  secondaryCtaLink: zod.string().optional(),
+  sortOrder: zod.number().optional(),
+  isActive: zod.boolean().optional(),
+});
+
+export const UpdateHeroSlideResponse = zod.object({
+  id: zod.number(),
+  mediaType: zod.enum(["image", "video"]),
+  imageUrl: zod.string(),
+  imageUrl2: zod.string(),
+  videoUrl: zod.string(),
+  title: zod.string(),
+  subtitle: zod.string(),
+  ctaText: zod.string(),
+  ctaLink: zod.string(),
+  secondaryCtaText: zod.string(),
+  secondaryCtaLink: zod.string(),
+  sortOrder: zod.number(),
+  isActive: zod.boolean(),
+  createdAt: zod.string(),
+});
+
+/**
+ * @summary Delete a hero slide (admin)
+ */
+export const DeleteHeroSlideParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+/**
+ * @summary Popular search terms derived from product data
+ */
+export const GetSearchSuggestionsResponse = zod.object({
+  terms: zod.array(zod.string()),
+});
+
+/**
  * @summary Get cart items
  */
 export const GetCartResponseItem = zod.object({
