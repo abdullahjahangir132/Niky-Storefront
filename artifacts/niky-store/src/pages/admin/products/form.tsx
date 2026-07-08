@@ -32,6 +32,7 @@ const productSchema = z.object({
   brandLine: z.string().optional(),
   sku: z.string().optional(),
   videoUrl: z.string().optional(),
+  tags: z.string().optional(),
   isFeatured: z.boolean().default(false),
   isNew: z.boolean().default(false),
   isOnSale: z.boolean().default(false),
@@ -250,6 +251,7 @@ export default function AdminProductForm() {
       brandLine: "",
       sku: "",
       videoUrl: "",
+      tags: "",
       isFeatured: false, isNew: true, isOnSale: false,
     },
   });
@@ -272,6 +274,7 @@ export default function AdminProductForm() {
         brandLine: product.brandLine || "",
         sku: product.sku || "",
         videoUrl: (product as any).videoUrl || "",
+        tags: (product.tags || []).join(", "),
         isFeatured: product.isFeatured,
         isNew: product.isNew,
         isOnSale: product.isOnSale || false,
@@ -305,6 +308,7 @@ export default function AdminProductForm() {
       imageUrls: images,
       sizes: values.sizes.split(",").map((s) => s.trim()).filter(Boolean),
       colors: colorNames.map((name) => ({ name, hex: COLOR_HEX[name.toLowerCase()] || "#888888" })),
+      tags: (values.tags || "").split(",").map((s) => s.trim().toLowerCase()).filter(Boolean),
     };
     if (isEdit) updateProduct.mutate({ id: productId, data: formatted });
     else createProduct.mutate({ data: formatted });
@@ -447,16 +451,35 @@ export default function AdminProductForm() {
               <FormField control={form.control} name="subCategory" render={({ field }) => (
                 <FormItem>
                   <FormLabel>Sub Category</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value || ""}>
-                    <FormControl>
-                      <SelectTrigger><SelectValue placeholder="Select sub category" /></SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {["running", "casual", "formal", "sports", "sandals", "boots"].map(s => (
-                        <SelectItem key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</SelectItem>
+                  <FormControl>
+                    <Input {...field} list="subcategory-suggestions" placeholder="running, casual, formal…" />
+                  </FormControl>
+                  <datalist id="subcategory-suggestions">
+                    {["running", "casual", "formal", "sports", "sandals", "boots"].map(s => (
+                      <option key={s} value={s} />
+                    ))}
+                  </datalist>
+                  <p className="text-xs text-muted-foreground mt-1">Pick an existing type or type a new one — it will appear in the site navigation automatically.</p>
+                  <FormMessage />
+                </FormItem>
+              )} />
+
+              <FormField control={form.control} name="tags" render={({ field }) => (
+                <FormItem className="md:col-span-2">
+                  <FormLabel>Tags (comma separated)</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="marathon, waterproof, carbon plate, limited" />
+                  </FormControl>
+                  {field.value && (
+                    <div className="flex flex-wrap gap-1.5 mt-2">
+                      {field.value.split(",").map((s) => s.trim()).filter(Boolean).map((t, i) => (
+                        <span key={i} className="px-2 py-0.5 rounded-full bg-accent/10 text-accent text-xs font-semibold uppercase tracking-wide">
+                          {t}
+                        </span>
                       ))}
-                    </SelectContent>
-                  </Select>
+                    </div>
+                  )}
+                  <p className="text-xs text-muted-foreground mt-1">Used for search, filtering, and the site's mega-menu "Trending" links.</p>
                   <FormMessage />
                 </FormItem>
               )} />

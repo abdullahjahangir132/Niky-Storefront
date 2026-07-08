@@ -1,16 +1,25 @@
 import { Link, useLocation } from "wouter";
-import { ShoppingBag, User, Menu, X, Search } from "lucide-react";
+import { ShoppingBag, User, Menu, X, Search, ChevronDown } from "lucide-react";
 import { useCart } from "@/hooks/use-cart";
 import { useUserAuth } from "@/hooks/use-user-auth";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { MegaMenuPanel, useNavMenu } from "./mega-menu";
+
+const MEGA_MENU_CATEGORIES = [
+  { value: "men", label: "Men" },
+  { value: "women", label: "Women" },
+  { value: "kids", label: "Kids" },
+] as const;
 
 export default function StoreNavbar() {
   const { itemCount, setIsCartDrawerOpen } = useCart();
   const { isLoggedIn } = useUserAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [location] = useLocation();
+  const navMenu = useNavMenu();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -22,16 +31,20 @@ export default function StoreNavbar() {
 
   useEffect(() => {
     setMobileMenuOpen(false);
+    setOpenMenu(null);
   }, [location]);
+
+  const megaMenuOpen = !!openMenu;
 
   return (
     <header
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b border-transparent",
-        isScrolled ? "bg-background/95 backdrop-blur-md border-border" : "bg-transparent"
+        isScrolled || megaMenuOpen ? "bg-background/95 backdrop-blur-md border-border" : "bg-transparent"
       )}
+      onMouseLeave={() => setOpenMenu(null)}
     >
-      <div className="container mx-auto px-4 md:px-6 h-20 flex items-center justify-between">
+      <div className="container mx-auto px-4 md:px-6 h-20 flex items-center justify-between relative">
         <div className="flex items-center gap-4">
           <button
             className="md:hidden p-2 -ml-2 text-foreground"
@@ -39,17 +52,30 @@ export default function StoreNavbar() {
           >
             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
-          
+
           <Link href="/" className="font-display font-bold text-2xl md:text-3xl tracking-tighter text-foreground">
             NANO<span className="text-accent">SHOES</span>
           </Link>
         </div>
 
-        <nav className="hidden md:flex items-center gap-8 font-sans font-medium text-sm tracking-wide uppercase">
-          <Link href="/collections/men" className="hover:text-accent transition-colors">Men</Link>
-          <Link href="/collections/women" className="hover:text-accent transition-colors">Women</Link>
-          <Link href="/collections/kids" className="hover:text-accent transition-colors">Kids</Link>
-          <Link href="/shop" className="hover:text-accent transition-colors">All Products</Link>
+        <nav className="hidden md:flex items-center gap-8 font-sans font-medium text-sm tracking-wide uppercase h-full">
+          {MEGA_MENU_CATEGORIES.map((cat) => (
+            <button
+              key={cat.value}
+              onMouseEnter={() => setOpenMenu(cat.value)}
+              onClick={() => setOpenMenu(openMenu === cat.value ? null : cat.value)}
+              className={cn(
+                "flex items-center gap-1 h-full hover:text-accent transition-colors",
+                openMenu === cat.value && "text-accent"
+              )}
+            >
+              {cat.label}
+              <ChevronDown size={13} className={cn("transition-transform", openMenu === cat.value && "rotate-180")} />
+            </button>
+          ))}
+          <Link href="/shop" onMouseEnter={() => setOpenMenu(null)} className="hover:text-accent transition-colors">
+            All Products
+          </Link>
         </nav>
 
         <div className="flex items-center gap-4 md:gap-6">
@@ -73,9 +99,18 @@ export default function StoreNavbar() {
         </div>
       </div>
 
+      {/* Mega Menu */}
+      {openMenu && (
+        <MegaMenuPanel
+          category={openMenu as "men" | "women" | "kids"}
+          data={navMenu[openMenu]}
+          onNavigate={() => setOpenMenu(null)}
+        />
+      )}
+
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden absolute top-20 left-0 right-0 bg-background border-b border-border p-4 flex flex-col gap-4 font-display text-xl uppercase font-bold shadow-xl animate-in slide-in-from-top-2">
+        <div className="md:hidden absolute top-20 left-0 right-0 bg-background border-b border-border p-4 flex flex-col gap-4 font-display text-xl uppercase font-bold shadow-xl animate-in slide-in-from-top-2 max-h-[80vh] overflow-y-auto">
           <Link href="/collections/men" className="py-2 border-b border-border/50">Men</Link>
           <Link href="/collections/women" className="py-2 border-b border-border/50">Women</Link>
           <Link href="/collections/kids" className="py-2 border-b border-border/50">Kids</Link>

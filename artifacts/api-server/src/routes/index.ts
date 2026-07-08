@@ -15,6 +15,7 @@ import reviewsRouter from "./reviews";
 import chatRouter from "./chat";
 import aiUsageRouter from "./ai-usage";
 import uploadRouter from "./upload";
+import navMenuRouter from "./nav-menu";
 
 const router: IRouter = Router();
 
@@ -34,5 +35,6 @@ router.use(reviewsRouter);
 router.use(chatRouter);
 router.use(aiUsageRouter);
 router.use(uploadRouter);
+router.use(navMenuRouter);
 
 export default router;

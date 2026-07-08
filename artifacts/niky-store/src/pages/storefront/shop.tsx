@@ -26,12 +26,18 @@ export default function Shop() {
   const params = new URLSearchParams(searchString);
 
   const [mainCategory, setMainCategory] = useState<string | undefined>(params.get("mainCategory") || undefined);
+  const [subCategory, setSubCategory] = useState<string | undefined>(params.get("subCategory") || undefined);
+  const [brandLine, setBrandLine] = useState<string | undefined>(params.get("brandLine") || undefined);
+  const [tag, setTag] = useState<string | undefined>(params.get("tag") || undefined);
   const [sort, setSort] = useState<ListProductsSort>((params.get("sort") as ListProductsSort) || "newest");
   const [search, setSearch] = useState<string | undefined>(params.get("search") || undefined);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const { data: productsData, isLoading } = useListProducts({
     mainCategory,
+    subCategory,
+    brandLine,
+    tag,
     sort,
     search,
     limit: 48,
@@ -97,7 +103,7 @@ export default function Shop() {
                 <Button
                   variant="outline"
                   className="w-full font-display uppercase tracking-wider"
-                  onClick={() => { setMainCategory(undefined); setSort("newest"); setSearch(undefined); setIsFilterOpen(false); }}
+                  onClick={() => { setMainCategory(undefined); setSubCategory(undefined); setBrandLine(undefined); setTag(undefined); setSort("newest"); setSearch(undefined); setIsFilterOpen(false); }}
                 >
                   Clear All Filters
                 </Button>
@@ -122,12 +128,30 @@ export default function Shop() {
         </div>
       </div>
 
-      {(mainCategory || search) && (
+      {(mainCategory || subCategory || brandLine || tag || search) && (
         <div className="flex flex-wrap gap-2 mb-8">
           {mainCategory && (
-            <span className="inline-flex items-center px-3 py-1 rounded-full bg-secondary text-sm font-medium">
+            <span className="inline-flex items-center px-3 py-1 rounded-full bg-secondary text-sm font-medium capitalize">
               {mainCategory}
               <button onClick={() => setMainCategory(undefined)} className="ml-2 hover:text-destructive"><X className="w-3 h-3" /></button>
+            </span>
+          )}
+          {subCategory && (
+            <span className="inline-flex items-center px-3 py-1 rounded-full bg-secondary text-sm font-medium capitalize">
+              {subCategory}
+              <button onClick={() => setSubCategory(undefined)} className="ml-2 hover:text-destructive"><X className="w-3 h-3" /></button>
+            </span>
+          )}
+          {brandLine && (
+            <span className="inline-flex items-center px-3 py-1 rounded-full bg-secondary text-sm font-medium">
+              {brandLine}
+              <button onClick={() => setBrandLine(undefined)} className="ml-2 hover:text-destructive"><X className="w-3 h-3" /></button>
+            </span>
+          )}
+          {tag && (
+            <span className="inline-flex items-center px-3 py-1 rounded-full bg-secondary text-sm font-medium capitalize">
+              #{tag}
+              <button onClick={() => setTag(undefined)} className="ml-2 hover:text-destructive"><X className="w-3 h-3" /></button>
             </span>
           )}
           {search && (

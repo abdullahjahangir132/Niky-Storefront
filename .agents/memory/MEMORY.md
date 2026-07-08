@@ -1,0 +1,3 @@
+- [Nav menu driven by product taxonomy](nav-driven-taxonomy.md) — mega-menu content is auto-generated from live product subCategory/brandLine/tags, not a separate CMS table.
+- [JSON column array-contains queries](json-array-contains-drizzle.md) — Postgres `json` columns need explicit `::jsonb` casts on both sides for `@>` containment queries in Drizzle.
+- [Vite HMR breaks React context after edits](vite-hmr-context-stale.md) — editing a component that consumes a context can transiently throw "must be used within Provider"; restart the workflow before treating it as a real bug.

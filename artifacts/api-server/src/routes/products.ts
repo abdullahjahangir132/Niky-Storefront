@@ -49,7 +49,7 @@ function mapProduct(p: typeof productsTable.$inferSelect, categoryName: string) 
 // GET /api/products
 router.get("/products", async (req, res) => {
   const {
-    category, mainCategory, subCategory, brandLine,
+    category, mainCategory, subCategory, brandLine, tag,
     search, sort, featured, isNew, onSale,
     minPrice, maxPrice,
     limit = "20", offset = "0",
@@ -64,6 +64,7 @@ router.get("/products", async (req, res) => {
   if (mainCategory) conditions.push(eq(productsTable.mainCategory, mainCategory));
   if (subCategory) conditions.push(eq(productsTable.subCategory, subCategory));
   if (brandLine) conditions.push(eq(productsTable.brandLine, brandLine));
+  if (tag) conditions.push(sql`${productsTable.tags}::jsonb @> ${JSON.stringify([tag])}::jsonb`);
   if (search) {
     conditions.push(or(ilike(productsTable.name, `%${search}%`), ilike(productsTable.description, `%${search}%`))!);
   }

@@ -413,6 +413,7 @@ export type ListProductsParams = {
   mainCategory?: string;
   subCategory?: string;
   brandLine?: string;
+  tag?: string;
   search?: string;
   sort?: ListProductsSort;
   featured?: boolean;

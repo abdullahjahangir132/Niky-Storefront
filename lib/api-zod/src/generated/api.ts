@@ -170,6 +170,7 @@ export const ListProductsQueryParams = zod.object({
   mainCategory: zod.coerce.string().optional(),
   subCategory: zod.coerce.string().optional(),
   brandLine: zod.coerce.string().optional(),
+  tag: zod.coerce.string().optional(),
   search: zod.coerce.string().optional(),
   sort: zod
     .enum([
