@@ -7,11 +7,31 @@ import { Input } from "@/components/ui/input";
 // ── Simple markdown renderer ─────────────────────────────────────────────────
 function renderInline(text: string): React.ReactNode[] {
   const parts: React.ReactNode[] = [];
-  const regex = /\*\*(.+?)\*\*/g;
+  // Match **bold** and [label](url) links
+  const regex = /\*\*(.+?)\*\*|\[([^\]]+)\]\(([^)]+)\)/g;
   let last = 0, m: RegExpExecArray | null;
   while ((m = regex.exec(text)) !== null) {
     if (m.index > last) parts.push(text.slice(last, m.index));
-    parts.push(<strong key={m.index} className="font-bold">{m[1]}</strong>);
+    if (m[1] !== undefined) {
+      // Bold
+      parts.push(<strong key={m.index} className="font-bold">{m[1]}</strong>);
+    } else {
+      // Link
+      const label = m[2];
+      const href = m[3];
+      const isInternal = href.startsWith("/");
+      parts.push(
+        <a
+          key={m.index}
+          href={href}
+          target={isInternal ? "_self" : "_blank"}
+          rel={isInternal ? undefined : "noopener noreferrer"}
+          className="text-accent underline underline-offset-2 hover:opacity-80 transition-opacity"
+        >
+          {label}
+        </a>
+      );
+    }
     last = regex.lastIndex;
   }
   if (last < text.length) parts.push(text.slice(last));

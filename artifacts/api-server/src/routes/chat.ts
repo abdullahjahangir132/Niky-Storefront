@@ -161,7 +161,12 @@ function detectCategory(msg: string): RuleCategory {
   return "unknown";
 }
 
-async function buildKbAnswer(userMsg: string, kb: KnowledgeBase, order: Awaited<ReturnType<typeof lookupOrder>>): Promise<string> {
+async function buildKbAnswer(
+  userMsg: string,
+  kb: KnowledgeBase,
+  order: Awaited<ReturnType<typeof lookupOrder>>,
+  lang = "en",
+): Promise<string> {
   const s = kb.settings;
   const phone = s.contactPhone || "+92 300 1234567";
   const whatsapp = s.whatsappNumber || phone;
@@ -171,49 +176,83 @@ async function buildKbAnswer(userMsg: string, kb: KnowledgeBase, order: Awaited<
   const freeShipping = s.freeShippingThreshold || "3000";
   const cat = detectCategory(userMsg);
 
-  const statusEmoji: Record<string, string> = {
-    pending: "⏳ Pending — processing ho raha hai",
-    confirmed: "✅ Confirmed — taiyar ho raha hai",
-    shipped: "🚚 Shipped — raaste mein hai",
-    delivered: "📦 Delivered — mil gaya!",
+  // "rur" = Roman Urdu; everything else uses English
+  const isUrdu = lang === "rur";
+
+  const statusLabel: Record<string, string> = {
+    pending:   isUrdu ? "⏳ Pending — processing ho raha hai"   : "⏳ Pending — being processed",
+    confirmed: isUrdu ? "✅ Confirmed — taiyar ho raha hai"     : "✅ Confirmed — being prepared",
+    shipped:   isUrdu ? "🚚 Shipped — raaste mein hai"         : "🚚 Shipped — on the way",
+    delivered: isUrdu ? "📦 Delivered — mil gaya!"             : "📦 Delivered",
     cancelled: "❌ Cancelled",
   };
 
-  if (cat === "order_tracking") {
-    if (order) {
-      type Item = { productName: string; quantity: number; size: string; color?: string };
-      const items = (order.items as Item[]).map((i) => `${i.productName} ×${i.quantity} (Size: ${i.size})`).join(", ");
-      return `📦 **Order Found!**
+  // ── Order found ────────────────────────────────────────────────────────────
+  if (order) {
+    type Item = { productName: string; quantity: number; size: string; color?: string };
+    const items = (order.items as Item[]).map((i) => `${i.productName} ×${i.quantity} (Size: ${i.size})`).join(", ");
+    const trackLine = order.trackingNumber
+      ? `**Tracking No:** ${order.trackingNumber}`
+      : isUrdu
+        ? "Tracking number ship hone ke baad share kiya jayega."
+        : "Tracking number will be shared once shipped.";
+
+    return isUrdu
+      ? `📦 **Order Mil Gaya!**
 
 **Order:** ${order.orderNumber || `#${order.id}`}
-**Status:** ${statusEmoji[order.status] || order.status}
+**Status:** ${statusLabel[order.status] || order.status}
 **Customer:** ${order.customerName}
 **Items:** ${items}
 **Total:** PKR ${Number(order.total).toLocaleString()}
 **Delivery:** ${order.city}, ${order.province || "Pakistan"}
-${order.trackingNumber ? `**Tracking No:** ${order.trackingNumber}` : "Tracking number ship hone ke baad share kiya jayega."}
+${trackLine}
 **Payment:** ${order.paymentMethod?.toUpperCase()} — ${order.paymentStatus}
 
-Kuch aur help chahiye? 😊`;
-    }
+Kuch aur help chahiye? 😊`
+      : `📦 **Order Found!**
 
-    // No order number found
-    if (/order|track/i.test(userMsg)) {
-      return `📦 **Order Track Karna Hai?**
+**Order:** ${order.orderNumber || `#${order.id}`}
+**Status:** ${statusLabel[order.status] || order.status}
+**Customer:** ${order.customerName}
+**Items:** ${items}
+**Total:** PKR ${Number(order.total).toLocaleString()}
+**Delivery:** ${order.city}, ${order.province || "Pakistan"}
+${trackLine}
+**Payment:** ${order.paymentMethod?.toUpperCase()} — ${order.paymentStatus}
+
+Is there anything else I can help you with? 😊`;
+  }
+
+  // ── Order tracking (no number given) ──────────────────────────────────────
+  if (cat === "order_tracking") {
+    return isUrdu
+      ? `📦 **Order Track Karna Hai?**
 
 Apna order track karne ke 2 tarike hain:
 
-1. **Website par:** /track-order page par jaayein aur order number daalen
-2. **Order number batayein:** Yahan order number ya email share karein aur main dekh leta hoon!
+1. **Website par:** [/track-order](/track-order) page par jaayein aur order number daalen
+2. **Yahan batayein:** Order number (#XXXXX) ya email share karein — main seedha check karta hoon!
 
-Order number aapki confirmation email mein hota hai.
+Order number confirmation email mein hota hai.
 
-Whatsapp par bhi puch sakte hain: ${whatsapp} 📱`;
-    }
+📱 WhatsApp par bhi pooch sakte hain: ${whatsapp}`
+      : `📦 **Want to Track Your Order?**
+
+Two ways to check your order:
+
+1. **On the website:** Go to [/track-order](/track-order) and enter your order number
+2. **Right here:** Share your order number (#XXXXX) or email — I'll look it up instantly!
+
+Your order number is in your confirmation email.
+
+📱 You can also WhatsApp us: ${whatsapp}`;
   }
 
+  // ── Payment ───────────────────────────────────────────────────────────────
   if (cat === "payment") {
-    return `💳 **Payment Methods — ${storeName}**
+    return isUrdu
+      ? `💳 **Payment Methods — ${storeName}**
 
 Hum ye payment methods accept karte hain:
 
@@ -224,11 +263,25 @@ Hum ye payment methods accept karte hain:
 
 Sab methods secure hain. COD sirf Pakistan mein available hai.
 
-Koi aur sawaal? 😊`;
+Koi aur sawaal? 😊`
+      : `💳 **Payment Methods — ${storeName}**
+
+We accept the following payment methods:
+
+• 💵 **COD** (Cash on Delivery) — pay cash when your order arrives
+• 💳 **Credit / Debit Card** — Visa, Mastercard
+• 📱 **EasyPaisa** — pay from your mobile account
+• 📱 **JazzCash** — pay from your mobile account
+
+All methods are secure. COD is available across Pakistan.
+
+Any other questions? 😊`;
   }
 
+  // ── Returns ───────────────────────────────────────────────────────────────
   if (cat === "return_policy") {
-    return `🔄 **Return & Exchange Policy**
+    return isUrdu
+      ? `🔄 **Return & Exchange Policy**
 
 **Return:**
 • Delivery ke **7 din** ke andar return kar sakte hain
@@ -240,15 +293,34 @@ Koi aur sawaal? 😊`;
 • Sale items: sirf exchange (return nahi)
 
 **Process:**
-1. Whatsapp karein: ${whatsapp}
+1. WhatsApp karein: ${whatsapp}
 2. Order number aur reason batayein
 3. Collection arrange ho jayegi
+
+**Contact:** ${email} | ${phone}`
+      : `🔄 **Return & Exchange Policy**
+
+**Returns:**
+• You can return within **7 days** of delivery
+• Shoes must be unworn and in the original box
+• Damaged or wrong item — free return + replacement
+
+**Exchanges:**
+• Wrong size? We'll exchange it for you!
+• Sale items: exchange only (no cash refund)
+
+**How to return:**
+1. WhatsApp us: ${whatsapp}
+2. Share your order number and reason
+3. We'll arrange a pickup
 
 **Contact:** ${email} | ${phone}`;
   }
 
+  // ── Contact ───────────────────────────────────────────────────────────────
   if (cat === "contact") {
-    return `📞 **${storeName} — Contact Us**
+    return isUrdu
+      ? `📞 **${storeName} — Humse Milein**
 
 • 📱 **WhatsApp:** ${whatsapp} _(fastest response)_
 • 📞 **Phone:** ${phone}
@@ -256,11 +328,22 @@ Koi aur sawaal? 😊`;
 • 🕐 **Hours:** Mon–Sat, 10AM–8PM
 ${s.address ? `• 📍 **Address:** ${s.address}` : ""}
 
-WhatsApp par message karein — 30 minutes mein reply guaranteed! 💬`;
+WhatsApp par message karein — 30 minutes mein reply guaranteed! 💬`
+      : `📞 **${storeName} — Contact Us**
+
+• 📱 **WhatsApp:** ${whatsapp} _(fastest response)_
+• 📞 **Phone:** ${phone}
+• 📧 **Email:** ${email}
+• 🕐 **Hours:** Mon–Sat, 10AM–8PM
+${s.address ? `• 📍 **Address:** ${s.address}` : ""}
+
+Message us on WhatsApp — reply guaranteed within 30 minutes! 💬`;
   }
 
+  // ── Shipping ──────────────────────────────────────────────────────────────
   if (cat === "shipping") {
-    return `🚚 **Shipping & Delivery — ${storeName}**
+    return isUrdu
+      ? `🚚 **Shipping & Delivery — ${storeName}**
 
 **Delivery Time:**
 • 🏙️ Lahore — **1–2 business days**
@@ -273,13 +356,33 @@ WhatsApp par message karein — 30 minutes mein reply guaranteed! 💬`;
 
 **Courier Partners:** TCS, Leopards, BlueEx
 
-Order tracking: **/track-order** page par check karein 📦`;
+Order tracking: [/track-order](/track-order) page par check karein 📦`
+      : `🚚 **Shipping & Delivery — ${storeName}**
+
+**Delivery Times:**
+• 🏙️ Lahore — **1–2 business days**
+• 🌆 Karachi / Islamabad — **2–3 business days**
+• 🏘️ Other cities — **3–5 business days**
+
+**Charges:**
+• Standard: **PKR ${Number(shipping).toLocaleString()}**
+• FREE shipping on orders above **PKR ${Number(freeShipping).toLocaleString()}** 🎉
+
+**Courier Partners:** TCS, Leopards, BlueEx
+
+Track your order at [/track-order](/track-order) 📦`;
   }
 
+  // ── Size guide ────────────────────────────────────────────────────────────
   if (cat === "size_guide") {
-    return `📏 **Size Guide — ${storeName}**
+    const tipLine = isUrdu
+      ? "**Tip:** Agar aap do sizes ke beech mein hain, ek size upar lein!"
+      : "**Tip:** If you're between two sizes, go one size up!";
+    const detailLine = isUrdu
+      ? "Detailed guide: [/size-guide](/size-guide) page par dekhein 📐"
+      : "See full guide at [/size-guide](/size-guide) 📐";
 
-Hum Pakistan standard sizing follow karte hain:
+    return `📏 **Size Guide — ${storeName}**
 
 | Pakistan | EU | UK | US |
 |---------|----|----|-----|
@@ -290,36 +393,44 @@ Hum Pakistan standard sizing follow karte hain:
 | 10 | 43 | 10 | 11 |
 | 11 | 44 | 11 | 12 |
 
-**Tip:** Agar aap do sizes ke beech mein hain, ek size upar lein!
-Detailed guide: **/size-guide** page par dekhein 📐`;
+${tipLine}
+${detailLine}`;
   }
 
+  // ── Products ──────────────────────────────────────────────────────────────
   if (cat === "products") {
     const saleItems = kb.products.filter((p) => p.isOnSale);
-    const newItems = kb.products.filter((p) => p.isNew);
+    const newItems  = kb.products.filter((p) => p.isNew);
     const cats = kb.categories.slice(0, 6).join(", ");
 
     let resp = `👟 **${storeName} — Product Catalog**\n\n`;
     resp += `**Categories:** ${cats || "Men, Women, Kids, Sports, Casual, Formal"}\n\n`;
+
     if (saleItems.length > 0) {
       resp += `🔥 **ON SALE (${saleItems.length} items):**\n`;
-      saleItems.slice(0, 3).forEach((p) => {
+      saleItems.slice(0, 4).forEach((p) => {
         resp += `• ${p.name} — PKR ${Number(p.salePrice || p.price).toLocaleString()}\n`;
       });
       resp += "\n";
     }
     if (newItems.length > 0) {
       resp += `✨ **NEW ARRIVALS (${newItems.length} items):**\n`;
-      newItems.slice(0, 3).forEach((p) => {
+      newItems.slice(0, 4).forEach((p) => {
         resp += `• ${p.name} — PKR ${Number(p.price).toLocaleString()}\n`;
       });
+      resp += "\n";
     }
-    resp += `\nPuri collection dekhne ke liye **/shop** visit karein! 🛍️`;
+
+    resp += isUrdu
+      ? `Puri collection dekhne ke liye [/shop](/shop) visit karein! 🛍️`
+      : `Browse the full collection at [/shop](/shop) 🛍️`;
     return resp;
   }
 
+  // ── About ─────────────────────────────────────────────────────────────────
   if (cat === "about") {
-    return `👟 **${storeName} — Move Beyond Limits**
+    return isUrdu
+      ? `👟 **${storeName} — Move Beyond Limits**
 
 Nano Shoes Pakistan ka premium footwear brand hai. Hum quality aur style ko affordable pricing par provide karte hain.
 
@@ -331,11 +442,26 @@ Nano Shoes Pakistan ka premium footwear brand hai. Hum quality aur style ko affo
 
 **Collections:** Men | Women | Kids | Sports | Casual | Formal
 
-Apni pasand ki shoes **/shop** par dekhein! 😊`;
+Apni pasand ki shoes [/shop](/shop) par dekhein! 😊`
+      : `👟 **${storeName} — Move Beyond Limits**
+
+Nano Shoes is Pakistan's premium footwear brand — quality and style at prices made for Pakistan.
+
+• 🏆 Premium quality materials
+• 🇵🇰 Proudly Pakistani brand
+• 📦 Nationwide delivery
+• ✅ 7-day return policy
+• 💰 Affordable prices in PKR
+
+**Collections:** Men | Women | Kids | Sports | Casual | Formal
+
+Browse our collection at [/shop](/shop) 😊`;
   }
 
+  // ── Greeting ──────────────────────────────────────────────────────────────
   if (cat === "greeting") {
-    return `Salam! 👋 Main **NanoBot** hoon — ${storeName} ka AI assistant!
+    return isUrdu
+      ? `Salam! 👋 Main **NanoBot** hoon — ${storeName} ka AI assistant!
 
 Main in sawaalon mein aapki madad kar sakta hoon:
 • 📦 Order tracking
@@ -346,11 +472,24 @@ Main in sawaalon mein aapki madad kar sakta hoon:
 • 👟 Products & collections
 • 📞 Customer support contact
 
-Kya jaanna chahte hain? 😊`;
+Kya jaanna chahte hain? 😊`
+      : `Hello! 👋 I'm **NanoBot** — the AI assistant for ${storeName}!
+
+I can help you with:
+• 📦 Order tracking
+• 💳 Payment methods
+• 🔄 Return & exchange policy
+• 🚚 Shipping & delivery info
+• 📏 Size guide
+• 👟 Products & collections
+• 📞 Customer support
+
+What would you like to know? 😊`;
   }
 
-  // Unknown — give a helpful generic response
-  return `Mujhe samajh nahi aaya, lekin main in topics mein madad kar sakta hoon:
+  // ── Unknown ───────────────────────────────────────────────────────────────
+  return isUrdu
+    ? `Mujhe samajh nahi aaya, lekin main in topics mein madad kar sakta hoon:
 
 • **📦 Order Track** — order number ya email batayein
 • **💳 Payments** — COD, Card, EasyPaisa, JazzCash
@@ -361,6 +500,19 @@ Kya jaanna chahte hain? 😊`;
 • **📞 Contact** — phone, WhatsApp, email
 
 Ya seedha humse contact karein:
+📱 WhatsApp: ${whatsapp}
+📧 Email: ${email}`
+    : `I'm not sure I understood that, but I can help with:
+
+• **📦 Order Tracking** — share your order number or email
+• **💳 Payments** — COD, Card, EasyPaisa, JazzCash
+• **🔄 Returns** — 7-day return & exchange policy
+• **🚚 Shipping** — delivery times and charges
+• **📏 Size Guide** — find your perfect size
+• **👟 Products** — sale, new arrivals, collections
+• **📞 Contact** — phone, WhatsApp, email
+
+Or reach us directly:
 📱 WhatsApp: ${whatsapp}
 📧 Email: ${email}`;
 }
@@ -517,7 +669,7 @@ async function* streamAnthropic(apiKey: string, systemPrompt: string, messages: 
 // ── Main chat route ───────────────────────────────────────────────────────────
 router.post("/chat", async (req, res) => {
   try {
-    const { messages } = req.body as { messages?: ChatMsg[] };
+    const { messages, language = "en" } = req.body as { messages?: ChatMsg[]; language?: string };
     if (!Array.isArray(messages) || messages.length === 0) {
       res.status(400).json({ error: "messages array required" });
       return;
@@ -538,12 +690,11 @@ router.post("/chat", async (req, res) => {
     res.setHeader("Content-Type", "text/event-stream");
     res.setHeader("Cache-Control", "no-cache");
     res.setHeader("Connection", "keep-alive");
-    res.setHeader("X-Accel-Buffering", "no"); // disable nginx/proxy buffering for SSE
+    res.setHeader("X-Accel-Buffering", "no");
 
-    // ── NO API KEY → return rule-based answer as plain JSON (no SSE needed) ──
+    // ── NO API KEY → rule-based KB answer ────────────────────────────────────
     if (!apiKey) {
-      const answer = await buildKbAnswer(lastUserMsg, kb, order);
-      // Return as plain JSON — frontend handles both SSE and JSON responses
+      const answer = await buildKbAnswer(lastUserMsg, kb, order, language);
       res.removeHeader("Content-Type");
       res.removeHeader("Cache-Control");
       res.removeHeader("Connection");
@@ -559,7 +710,7 @@ router.post("/chat", async (req, res) => {
       return;
     }
 
-    // ── API KEY AVAILABLE → stream from AI provider, fall back to KB on error ──
+    // ── API KEY → stream AI, fall back to KB on error ─────────────────────────
     const systemPrompt = [BASE_SYSTEM, "\n", kb.text, order ? `\n\n=== ORDER INFO ===\n${JSON.stringify(order)}` : ""].join("\n");
     const modelName = provider === "gemini" ? "gemini-2.0-flash" : provider === "openai" ? "gpt-4o-mini" : "claude-haiku-4-5";
 
@@ -583,10 +734,9 @@ router.post("/chat", async (req, res) => {
         if (chunk.tokensOut !== undefined) tokensOut = chunk.tokensOut;
       }
     } catch (aiErr) {
-      // AI provider failed (rate limit, bad key, network, etc.) — fall back to KB
       req.log.warn({ err: aiErr }, "AI provider error — falling back to knowledge-base");
       if (!aiSucceeded) {
-        const kbAnswer = await buildKbAnswer(lastUserMsg, kb, order);
+        const kbAnswer = await buildKbAnswer(lastUserMsg, kb, order, language);
         for await (const text of streamText(kbAnswer)) {
           res.write(`data: ${JSON.stringify({ content: text })}\n\n`);
         }
@@ -619,10 +769,11 @@ router.post("/chat", async (req, res) => {
   } catch (error) {
     req.log.error(error, "Chat error");
     if (!res.headersSent) {
-      // Last-resort fallback: return KB answer as JSON
       try {
-        const [kb2, order2] = await Promise.all([getKnowledgeBase(), lookupOrder(req.body?.messages?.slice(-1)?.[0]?.content ?? "")]);
-        const answer = await buildKbAnswer(req.body?.messages?.slice(-1)?.[0]?.content ?? "", kb2, order2);
+        const lang = (req.body as any)?.language || "en";
+        const msg = (req.body as any)?.messages?.slice(-1)?.[0]?.content ?? "";
+        const [kb2, order2] = await Promise.all([getKnowledgeBase(), lookupOrder(msg)]);
+        const answer = await buildKbAnswer(msg, kb2, order2, lang);
         res.json({ content: answer, done: true });
       } catch {
         res.status(500).json({ error: "Something went wrong" });
