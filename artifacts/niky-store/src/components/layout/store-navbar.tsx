@@ -42,7 +42,7 @@ export default function StoreNavbar() {
     <>
     <header
       className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b border-transparent",
+        "w-full transition-all duration-300 border-b border-transparent",
         isScrolled || megaMenuOpen ? "bg-background/95 backdrop-blur-md border-border" : "bg-transparent"
       )}
       onMouseLeave={() => setOpenMenu(null)}

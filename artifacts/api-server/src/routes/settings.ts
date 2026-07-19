@@ -8,6 +8,22 @@ const DEFAULT_THEME_1 = JSON.stringify({ name: "Stealth Black", bg: "#0a0a0a", a
 const DEFAULT_THEME_2 = JSON.stringify({ name: "Midnight Navy", bg: "#0d1b2a", accent: "#d4af37", highlight: "#ffffff" });
 const DEFAULT_THEME_3 = JSON.stringify({ name: "Forest Elite", bg: "#0d1a10", accent: "#ff3355", highlight: "#ffffff" });
 
+const DEFAULT_ANNOUNCEMENT_ITEMS = JSON.stringify([
+  "📞 Helpline: +92 300 1234567",
+  "🚚 Standard shipping PKR 200",
+  "🎉 Free shipping above PKR 3,000",
+  "✨ New Collection — Drop I LIVE NOW",
+]);
+
+const DEFAULT_TAG_BAR_ITEMS = JSON.stringify([
+  "NANO AIR",
+  "NANO PRO",
+  "NANO FLEX",
+  "NANO CLASSIC",
+  "NANO SPORT",
+  "NANO LITE",
+]);
+
 const DEFAULT_SETTINGS = {
   storeName: "Nano Shoes",
   tagline: "Move Beyond Limits",
@@ -39,6 +55,12 @@ const DEFAULT_SETTINGS = {
   theme1: DEFAULT_THEME_1,
   theme2: DEFAULT_THEME_2,
   theme3: DEFAULT_THEME_3,
+  // Announcement bar
+  announcementBarEnabled: "true",
+  announcementBarItems: DEFAULT_ANNOUNCEMENT_ITEMS,
+  // Tag scroll bar
+  tagBarEnabled: "true",
+  tagBarItems: DEFAULT_TAG_BAR_ITEMS,
 };
 
 type SettingsType = typeof DEFAULT_SETTINGS;
@@ -78,6 +100,10 @@ async function getAllSettings(): Promise<SettingsType> {
     theme1: map.theme1 ?? DEFAULT_SETTINGS.theme1,
     theme2: map.theme2 ?? DEFAULT_SETTINGS.theme2,
     theme3: map.theme3 ?? DEFAULT_SETTINGS.theme3,
+    announcementBarEnabled: map.announcementBarEnabled ?? DEFAULT_SETTINGS.announcementBarEnabled,
+    announcementBarItems: map.announcementBarItems ?? DEFAULT_SETTINGS.announcementBarItems,
+    tagBarEnabled: map.tagBarEnabled ?? DEFAULT_SETTINGS.tagBarEnabled,
+    tagBarItems: map.tagBarItems ?? DEFAULT_SETTINGS.tagBarItems,
   };
 }
 
@@ -92,6 +118,10 @@ router.get("/settings/public", async (_req, res) => {
     theme1: all.theme1,
     theme2: all.theme2,
     theme3: all.theme3,
+    announcementBarEnabled: all.announcementBarEnabled,
+    announcementBarItems: all.announcementBarItems,
+    tagBarEnabled: all.tagBarEnabled,
+    tagBarItems: all.tagBarItems,
   });
 });
 

@@ -5,6 +5,7 @@ import { useListProducts } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/utils";
 import HeroCarousel from "@/components/storefront/hero-carousel";
+import TagScrollBar from "@/components/storefront/tag-scroll-bar";
 
 export default function Home() {
   const { data: featuredProducts } = useListProducts({ featured: true, limit: 4 });
@@ -16,20 +17,8 @@ export default function Home() {
       {/* Hero Section */}
       <HeroCarousel />
 
-      {/* Brand Lines Marquee */}
-      <section className="border-y border-border py-4 overflow-hidden bg-secondary/10">
-        <div className="flex animate-marquee whitespace-nowrap">
-          {["Nano Air", "Nano Pro", "Nano Flex", "Nano Classic", "Nano Air", "Nano Pro", "Nano Flex", "Nano Classic", "Nano Air", "Nano Pro", "Nano Flex", "Nano Classic", "Nano Air", "Nano Pro", "Nano Flex", "Nano Classic"].map((b, i) => (
-            <Link
-              key={i}
-              href={`/shop?brandLine=${encodeURIComponent(b)}`}
-              className="mx-10 font-display font-black text-xl uppercase tracking-widest text-muted-foreground/50 hover:text-accent transition-colors duration-200 cursor-pointer flex-shrink-0"
-            >
-              {b} <span className="text-accent/30 mx-4">✦</span>
-            </Link>
-          ))}
-        </div>
-      </section>
+      {/* Tag Scroll Bar */}
+      <TagScrollBar />
 
       {/* Featured */}
       <section className="py-24 px-4 bg-background">

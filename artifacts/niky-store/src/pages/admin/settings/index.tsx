@@ -5,9 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
-import { Save, Upload, Instagram, Facebook, Store, Smartphone, Globe, Phone, MessageCircle, Bot, Eye, EyeOff, CheckCircle2 } from "lucide-react";
+import { Save, Upload, Instagram, Facebook, Store, Smartphone, Globe, Phone, MessageCircle, Bot, Eye, EyeOff, CheckCircle2, Plus, Trash2, Megaphone, Tag } from "lucide-react";
 
 async function uploadImage(file: File): Promise<string> {
   const fd = new FormData();
@@ -103,6 +104,16 @@ export default function AdminSettings() {
     anthropicApiKey: "",
   });
   const [showKeys, setShowKeys] = useState<Record<string, boolean>>({});
+  const [announcementBar, setAnnouncementBar] = useState({
+    enabled: true,
+    items: ["📞 Helpline: +92 300 1234567", "🚚 Standard shipping PKR 200", "🎉 Free shipping above PKR 3,000", "✨ New Collection — Drop I LIVE NOW"],
+    newItem: "",
+  });
+  const [tagBar, setTagBar] = useState({
+    enabled: true,
+    items: ["NANO AIR", "NANO PRO", "NANO FLEX", "NANO CLASSIC", "NANO SPORT", "NANO LITE"],
+    newItem: "",
+  });
 
   useEffect(() => {
     if (settings) {
@@ -135,6 +146,24 @@ export default function AdminSettings() {
         openaiApiKey: (settings as any).openaiApiKey || "",
         anthropicApiKey: (settings as any).anthropicApiKey || "",
       });
+      // Announcement bar
+      try {
+        const annItems = JSON.parse((settings as any).announcementBarItems || "[]");
+        setAnnouncementBar((prev) => ({
+          ...prev,
+          enabled: (settings as any).announcementBarEnabled !== "false",
+          items: Array.isArray(annItems) && annItems.length > 0 ? annItems : prev.items,
+        }));
+      } catch { /* keep defaults */ }
+      // Tag bar
+      try {
+        const tagItems = JSON.parse((settings as any).tagBarItems || "[]");
+        setTagBar((prev) => ({
+          ...prev,
+          enabled: (settings as any).tagBarEnabled !== "false",
+          items: Array.isArray(tagItems) && tagItems.length > 0 ? tagItems : prev.items,
+        }));
+      } catch { /* keep defaults */ }
     }
   }, [settings]);
 
@@ -156,13 +185,16 @@ export default function AdminSettings() {
 
       <div className="max-w-3xl space-y-8">
         <Tabs defaultValue="store-info">
-          <TabsList className="grid w-full grid-cols-5 mb-6 h-11">
-            <TabsTrigger value="store-info" className="font-display uppercase tracking-wider text-xs">Store Info</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-6 mb-6 h-11">
+            <TabsTrigger value="store-info" className="font-display uppercase tracking-wider text-xs">Store</TabsTrigger>
             <TabsTrigger value="social" className="font-display uppercase tracking-wider text-xs">Social</TabsTrigger>
-            <TabsTrigger value="app-links" className="font-display uppercase tracking-wider text-xs">App Links</TabsTrigger>
+            <TabsTrigger value="app-links" className="font-display uppercase tracking-wider text-xs">Apps</TabsTrigger>
             <TabsTrigger value="shipping" className="font-display uppercase tracking-wider text-xs">Shipping</TabsTrigger>
             <TabsTrigger value="ai" className="font-display uppercase tracking-wider text-xs flex items-center gap-1">
               <Bot className="w-3 h-3" /> AI
+            </TabsTrigger>
+            <TabsTrigger value="bars" className="font-display uppercase tracking-wider text-xs flex items-center gap-1">
+              <Megaphone className="w-3 h-3" /> Bars
             </TabsTrigger>
           </TabsList>
 
@@ -531,6 +563,229 @@ export default function AdminSettings() {
                 </CardFooter>
               </form>
             </Card>
+          </TabsContent>
+
+          {/* Bars Tab */}
+          <TabsContent value="bars">
+            <div className="space-y-6">
+              {/* Announcement Bar */}
+              <Card>
+                <form onSubmit={(e) => {
+                  e.preventDefault();
+                  updateSettings.mutate({ data: {
+                    announcementBarEnabled: String(announcementBar.enabled),
+                    announcementBarItems: JSON.stringify(announcementBar.items),
+                  } as any });
+                }}>
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle className="font-display uppercase tracking-wider text-lg flex items-center gap-2">
+                          <Megaphone className="w-4 h-4 text-accent" /> Announcement Bar
+                        </CardTitle>
+                        <CardDescription>Scrolling ticker at the top of every page. Great for promotions, helpline, free shipping info.</CardDescription>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                          {announcementBar.enabled ? "On" : "Off"}
+                        </Label>
+                        <Switch
+                          checked={announcementBar.enabled}
+                          onCheckedChange={(v) => setAnnouncementBar({ ...announcementBar, enabled: v })}
+                        />
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {/* Existing items */}
+                    <div className="space-y-2">
+                      <Label className="font-bold uppercase tracking-wider text-xs text-muted-foreground">Items (drag to reorder)</Label>
+                      {announcementBar.items.map((item, i) => (
+                        <div key={i} className="flex items-center gap-2">
+                          <Input
+                            value={item}
+                            onChange={(e) => {
+                              const updated = [...announcementBar.items];
+                              updated[i] = e.target.value;
+                              setAnnouncementBar({ ...announcementBar, items: updated });
+                            }}
+                            className="text-sm"
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setAnnouncementBar({ ...announcementBar, items: announcementBar.items.filter((_, idx) => idx !== i) })}
+                            className="shrink-0 text-destructive hover:text-destructive"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                    {/* Add new item */}
+                    <div className="flex gap-2">
+                      <Input
+                        value={announcementBar.newItem}
+                        onChange={(e) => setAnnouncementBar({ ...announcementBar, newItem: e.target.value })}
+                        placeholder="e.g. 🎉 Sale ends Sunday!"
+                        className="text-sm"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            if (announcementBar.newItem.trim()) {
+                              setAnnouncementBar({ ...announcementBar, items: [...announcementBar.items, announcementBar.newItem.trim()], newItem: "" });
+                            }
+                          }
+                        }}
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => {
+                          if (announcementBar.newItem.trim()) {
+                            setAnnouncementBar({ ...announcementBar, items: [...announcementBar.items, announcementBar.newItem.trim()], newItem: "" });
+                          }
+                        }}
+                        className="shrink-0 font-display uppercase tracking-wider text-xs"
+                      >
+                        <Plus className="w-3.5 h-3.5 mr-1" /> Add
+                      </Button>
+                    </div>
+                    {/* Preview */}
+                    {announcementBar.items.length > 0 && announcementBar.enabled && (
+                      <div className="bg-[#111] rounded-lg overflow-hidden">
+                        <div className="flex items-center h-9 overflow-hidden">
+                          <div className="flex animate-marquee whitespace-nowrap">
+                            {[...announcementBar.items, ...announcementBar.items].map((item, i) => (
+                              <span key={i} className="flex items-center flex-shrink-0">
+                                <span className="text-[11px] font-semibold tracking-wider uppercase px-8 text-white">{item}</span>
+                                <span className="text-accent/60 text-[10px]">•</span>
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                  <CardFooter className="border-t px-6 py-4">
+                    <Button type="submit" disabled={updateSettings.isPending} className="font-display uppercase tracking-wider">
+                      <Save className="w-4 h-4 mr-2" /> Save Announcement Bar
+                    </Button>
+                  </CardFooter>
+                </form>
+              </Card>
+
+              {/* Tag Bar */}
+              <Card>
+                <form onSubmit={(e) => {
+                  e.preventDefault();
+                  updateSettings.mutate({ data: {
+                    tagBarEnabled: String(tagBar.enabled),
+                    tagBarItems: JSON.stringify(tagBar.items),
+                  } as any });
+                }}>
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle className="font-display uppercase tracking-wider text-lg flex items-center gap-2">
+                          <Tag className="w-4 h-4 text-accent" /> Tag Scroll Bar
+                        </CardTitle>
+                        <CardDescription>Scrolling brand line names below the hero carousel. Click each tag to browse that collection.</CardDescription>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                          {tagBar.enabled ? "On" : "Off"}
+                        </Label>
+                        <Switch
+                          checked={tagBar.enabled}
+                          onCheckedChange={(v) => setTagBar({ ...tagBar, enabled: v })}
+                        />
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {/* Existing items */}
+                    <div className="space-y-2">
+                      <Label className="font-bold uppercase tracking-wider text-xs text-muted-foreground">Brand Lines</Label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {tagBar.items.map((item, i) => (
+                          <div key={i} className="flex items-center gap-2">
+                            <Input
+                              value={item}
+                              onChange={(e) => {
+                                const updated = [...tagBar.items];
+                                updated[i] = e.target.value;
+                                setTagBar({ ...tagBar, items: updated });
+                              }}
+                              className="text-sm font-display uppercase tracking-wide"
+                            />
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => setTagBar({ ...tagBar, items: tagBar.items.filter((_, idx) => idx !== i) })}
+                              className="shrink-0 text-destructive hover:text-destructive"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    {/* Add new item */}
+                    <div className="flex gap-2">
+                      <Input
+                        value={tagBar.newItem}
+                        onChange={(e) => setTagBar({ ...tagBar, newItem: e.target.value })}
+                        placeholder="e.g. NANO RUN"
+                        className="text-sm font-display uppercase tracking-wide"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            if (tagBar.newItem.trim()) {
+                              setTagBar({ ...tagBar, items: [...tagBar.items, tagBar.newItem.trim().toUpperCase()], newItem: "" });
+                            }
+                          }
+                        }}
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => {
+                          if (tagBar.newItem.trim()) {
+                            setTagBar({ ...tagBar, items: [...tagBar.items, tagBar.newItem.trim().toUpperCase()], newItem: "" });
+                          }
+                        }}
+                        className="shrink-0 font-display uppercase tracking-wider text-xs"
+                      >
+                        <Plus className="w-3.5 h-3.5 mr-1" /> Add
+                      </Button>
+                    </div>
+                    {/* Preview */}
+                    {tagBar.items.length > 0 && tagBar.enabled && (
+                      <div className="bg-[#1a1a1a] rounded-lg overflow-hidden">
+                        <div className="flex items-center h-14 overflow-hidden">
+                          <div className="flex animate-marquee whitespace-nowrap">
+                            {[...tagBar.items, ...tagBar.items, ...tagBar.items].map((item, i) => (
+                              <span key={i} className="flex items-center flex-shrink-0">
+                                <span className="font-display font-black text-sm uppercase tracking-[0.15em] text-white/80 px-10">{item}</span>
+                                <span className="text-accent font-black text-base">+</span>
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                  <CardFooter className="border-t px-6 py-4">
+                    <Button type="submit" disabled={updateSettings.isPending} className="font-display uppercase tracking-wider">
+                      <Save className="w-4 h-4 mr-2" /> Save Tag Bar
+                    </Button>
+                  </CardFooter>
+                </form>
+              </Card>
+            </div>
           </TabsContent>
         </Tabs>
 
