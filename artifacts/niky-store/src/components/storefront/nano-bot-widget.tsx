@@ -235,7 +235,7 @@ export function NanoBotWidget() {
     setMessages(prev => [...prev, { role: "assistant", content: "" }]);
 
     try {
-      const res = await fetch("/api/chat", {
+      const res = await fetch(`${import.meta.env.BASE_URL}api/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ language, messages: nextMessages }),

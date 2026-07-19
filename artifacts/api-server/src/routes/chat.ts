@@ -94,16 +94,22 @@ ${cats.map((c) => c.name).join(", ")}`;
 
 // ── Order lookup ─────────────────────────────────────────────────────────────
 async function lookupOrder(text: string) {
-  const orderMatch = text.match(/\b(?:ORD[-\s]?\d{3,}|#\d{4,}|\d{6,})\b/i);
+  // Match: #5, #000005, ORD-5, ORD123, 6-digit plain numbers, order id: 5
+  const orderMatch = text.match(/#(\d+)|ORD[-\s]?(\d+)|\border\s*(?:id|no|number|#)?\s*[:\-]?\s*(\d+)\b|\b(\d{4,})\b/i);
   const emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
   if (!orderMatch && !emailMatch) return null;
   try {
     let order = null;
     if (orderMatch) {
-      const raw = orderMatch[0].replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
-      const numId = parseInt(raw.replace(/\D/g, "")) || 0;
+      // Extract the numeric part from whichever capture group matched
+      const numStr = orderMatch[1] ?? orderMatch[2] ?? orderMatch[3] ?? orderMatch[4] ?? "";
+      const numId = parseInt(numStr, 10) || 0;
+      const rawFull = orderMatch[0].replace(/[^a-zA-Z0-9]/g, "").toUpperCase();
       const results = await db.select().from(ordersTable)
-        .where(or(like(ordersTable.orderNumber, `%${raw}%`), numId > 0 ? eq(ordersTable.id, numId) : undefined))
+        .where(or(
+          numId > 0 ? eq(ordersTable.id, numId) : undefined,
+          like(ordersTable.orderNumber, `%${rawFull}%`),
+        ))
         .limit(1);
       order = results[0] ?? null;
     }
@@ -553,7 +559,7 @@ router.post("/chat", async (req, res) => {
       return;
     }
 
-    // ── API KEY AVAILABLE → stream from AI provider ──
+    // ── API KEY AVAILABLE → stream from AI provider, fall back to KB on error ──
     const systemPrompt = [BASE_SYSTEM, "\n", kb.text, order ? `\n\n=== ORDER INFO ===\n${JSON.stringify(order)}` : ""].join("\n");
     const modelName = provider === "gemini" ? "gemini-2.0-flash" : provider === "openai" ? "gpt-4o-mini" : "claude-haiku-4-5";
 
@@ -564,13 +570,37 @@ router.post("/chat", async (req, res) => {
       : streamAnthropic(apiKey, systemPrompt, messages);
 
     let tokensIn = 0, tokensOut = 0;
-    for await (const chunk of stream) {
-      if (chunk.text) {
-        res.write(`data: ${JSON.stringify({ content: chunk.text })}\n\n`);
-        if (typeof (res as any).flush === "function") (res as any).flush();
+    let aiSucceeded = false;
+
+    try {
+      for await (const chunk of stream) {
+        if (chunk.text) {
+          aiSucceeded = true;
+          res.write(`data: ${JSON.stringify({ content: chunk.text })}\n\n`);
+          if (typeof (res as any).flush === "function") (res as any).flush();
+        }
+        if (chunk.tokensIn !== undefined) tokensIn = chunk.tokensIn;
+        if (chunk.tokensOut !== undefined) tokensOut = chunk.tokensOut;
       }
-      if (chunk.tokensIn !== undefined) tokensIn = chunk.tokensIn;
-      if (chunk.tokensOut !== undefined) tokensOut = chunk.tokensOut;
+    } catch (aiErr) {
+      // AI provider failed (rate limit, bad key, network, etc.) — fall back to KB
+      req.log.warn({ err: aiErr }, "AI provider error — falling back to knowledge-base");
+      if (!aiSucceeded) {
+        const kbAnswer = await buildKbAnswer(lastUserMsg, kb, order);
+        for await (const text of streamText(kbAnswer)) {
+          res.write(`data: ${JSON.stringify({ content: text })}\n\n`);
+        }
+        res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
+        res.end();
+
+        const sessionId = (req.session as any)?.id || req.headers["x-session-id"] as string || "anonymous";
+        db.insert(aiUsageLogsTable).values({
+          provider: "kb_fallback", model: "rule-based", sessionId,
+          userMessage: lastUserMsg.slice(0, 200),
+          tokensIn: 0, tokensOut: 0, totalTokens: 0,
+        }).catch(() => {});
+        return;
+      }
     }
 
     res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
@@ -588,7 +618,16 @@ router.post("/chat", async (req, res) => {
 
   } catch (error) {
     req.log.error(error, "Chat error");
-    if (!res.headersSent) res.status(500).json({ error: "Something went wrong" });
+    if (!res.headersSent) {
+      // Last-resort fallback: return KB answer as JSON
+      try {
+        const [kb2, order2] = await Promise.all([getKnowledgeBase(), lookupOrder(req.body?.messages?.slice(-1)?.[0]?.content ?? "")]);
+        const answer = await buildKbAnswer(req.body?.messages?.slice(-1)?.[0]?.content ?? "", kb2, order2);
+        res.json({ content: answer, done: true });
+      } catch {
+        res.status(500).json({ error: "Something went wrong" });
+      }
+    }
   }
 });
 
