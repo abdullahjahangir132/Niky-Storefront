@@ -1,7 +1,8 @@
 import { Link, useLocation } from "wouter";
-import { LayoutDashboard, ShoppingBag, ShoppingCart, Tags, Users, Ticket, Settings, LogOut, Bot, Palette, GalleryHorizontal } from "lucide-react";
+import { LayoutDashboard, ShoppingBag, ShoppingCart, Tags, Users, Ticket, Settings, LogOut, Bot, Palette, GalleryHorizontal, X } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-export function AdminSidebar() {
+export function AdminSidebar({ mobileOpen = false, onClose }: { mobileOpen?: boolean; onClose?: () => void }) {
   const [location] = useLocation();
 
   const links = [
@@ -18,15 +19,23 @@ export function AdminSidebar() {
   ];
 
   return (
-    <aside className="w-64 bg-sidebar text-sidebar-foreground border-r border-sidebar-border hidden md:flex flex-col min-h-screen sticky top-0">
-      <div className="h-16 flex items-center px-6 border-b border-sidebar-border">
-        <Link href="/" className="font-display font-black text-xl tracking-tighter text-white">
+    <aside className={cn(
+      "z-50 flex min-h-screen w-64 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground md:sticky md:top-0 md:flex",
+      mobileOpen ? "fixed inset-y-0 left-0 shadow-2xl" : "hidden"
+    )}>
+      <div className="flex h-16 items-center justify-between border-b border-sidebar-border px-5">
+        <Link href="/" onClick={onClose} className="font-display text-xl font-black tracking-[-0.08em] text-white">
           NANO<span className="text-accent">SHOES</span>
-          <span className="text-muted-foreground font-normal tracking-wide text-xs ml-2">ADMIN</span>
+          <span className="ml-2 text-[9px] font-normal tracking-[0.2em] text-muted-foreground">ADMIN</span>
         </Link>
+        {mobileOpen && (
+          <button onClick={onClose} aria-label="Close admin navigation" className="flex h-8 w-8 items-center justify-center text-muted-foreground transition-colors hover:text-white md:hidden">
+            <X className="h-4 w-4" />
+          </button>
+        )}
       </div>
 
-      <nav className="flex-1 py-6 px-4 space-y-2 overflow-y-auto">
+      <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-6">
         {links.map((link) => {
           const isActive = link.exact ? location === link.href : location.startsWith(link.href);
           const Icon = link.icon;
@@ -34,22 +43,25 @@ export function AdminSidebar() {
             <Link
               key={link.href}
               href={link.href}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors font-medium ${
+              onClick={onClose}
+              aria-current={isActive ? "page" : undefined}
+              className={`group relative flex items-center gap-3 rounded-md px-3.5 py-3 text-sm font-medium transition-colors ${
                 isActive
-                  ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                  : "text-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+                  ? "bg-accent text-white shadow-[0_8px_20px_hsl(var(--accent)/0.18)]"
+                  : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
               }`}
             >
-              <Icon className="w-5 h-5" />
+              <Icon className={cn("h-[18px] w-[18px] transition-transform group-hover:scale-105", isActive ? "text-white" : "text-muted-foreground")} />
               {link.label}
+              {isActive && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-white" />}
             </Link>
           );
         })}
       </nav>
 
-      <div className="p-4 border-t border-sidebar-border">
-        <Link href="/" className="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors font-medium text-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground">
-          <LogOut className="w-5 h-5" />
+      <div className="border-t border-sidebar-border p-3">
+        <Link href="/" onClick={onClose} className="flex items-center gap-3 rounded-md px-3.5 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
+          <LogOut className="h-[18px] w-[18px]" />
           Exit to Store
         </Link>
       </div>

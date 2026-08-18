@@ -10,11 +10,11 @@ import { ChevronDown, Search, MapPin, CreditCard, Mail, Phone, User, Package, Pr
 import { formatPrice } from "@/lib/utils";
 
 const STATUS_COLORS: Record<string, string> = {
-  pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
-  confirmed: "bg-blue-100 text-blue-800 border-blue-200",
-  shipped: "bg-purple-100 text-purple-800 border-purple-200",
-  delivered: "bg-green-100 text-green-800 border-green-200",
-  cancelled: "bg-red-100 text-red-800 border-red-200",
+  pending: "bg-amber-400/10 text-amber-300 border-amber-400/25",
+  confirmed: "bg-sky-400/10 text-sky-300 border-sky-400/25",
+  shipped: "bg-violet-400/10 text-violet-300 border-violet-400/25",
+  delivered: "bg-emerald-400/10 text-emerald-300 border-emerald-400/25",
+  cancelled: "bg-red-400/10 text-red-300 border-red-400/25",
 };
 
 function OrderDetailSheet({ order, open, onOpenChange, onStatusUpdate }: {
@@ -30,13 +30,13 @@ function OrderDetailSheet({ order, open, onOpenChange, onStatusUpdate }: {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-xl overflow-y-auto p-0">
-        <div className="sticky top-0 bg-card z-10 p-6 border-b flex justify-between items-start">
+        <div className="sticky top-0 z-10 flex items-start justify-between border-b border-border bg-card/95 p-5 backdrop-blur-xl md:p-6">
           <SheetHeader className="text-left">
             <SheetTitle className="font-display text-2xl uppercase tracking-tight">
               {(order as any).orderNumber || `#${order.id.toString().padStart(6, "0")}`}
             </SheetTitle>
             <div className="flex items-center gap-2 mt-1">
-              <span className={`px-2.5 py-0.5 text-xs font-bold rounded-full capitalize border ${STATUS_COLORS[order.status]}`}>
+              <span className={`border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${STATUS_COLORS[order.status] || "border-border bg-secondary text-muted-foreground"}`}>
                 {order.status}
               </span>
               <span className="text-xs text-muted-foreground">
@@ -49,13 +49,13 @@ function OrderDetailSheet({ order, open, onOpenChange, onStatusUpdate }: {
           </Button>
         </div>
 
-        <div className="p-6 space-y-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="space-y-7 p-5 md:p-6">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-2">
                 <User className="w-3 h-3" /> Customer
               </h3>
-              <div className="bg-secondary/20 p-4 rounded-xl text-sm space-y-1">
+              <div className="space-y-1 border border-border/70 bg-secondary/20 p-4 text-sm">
                 <p className="font-bold">{order.customerName}</p>
                 <p className="flex items-center gap-2 text-muted-foreground"><Mail className="w-3 h-3" /> {order.customerEmail}</p>
                 {order.customerPhone && (
@@ -67,7 +67,7 @@ function OrderDetailSheet({ order, open, onOpenChange, onStatusUpdate }: {
               <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-2">
                 <MapPin className="w-3 h-3" /> Shipping
               </h3>
-              <div className="bg-secondary/20 p-4 rounded-xl text-sm space-y-0.5">
+              <div className="space-y-0.5 border border-border/70 bg-secondary/20 p-4 text-sm">
                 <p className="font-medium">{order.shippingAddress}</p>
                 {order.addressLine2 && <p className="text-muted-foreground">{order.addressLine2}</p>}
                 <p className="text-muted-foreground">{order.city}{order.province ? `, ${order.province}` : ""}</p>
@@ -80,11 +80,11 @@ function OrderDetailSheet({ order, open, onOpenChange, onStatusUpdate }: {
             <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-3">
               <Package className="w-3 h-3" /> Items
             </h3>
-            <div className="border border-border rounded-xl overflow-hidden">
+            <div className="overflow-hidden border border-border">
               {order.items.map((item: any, i: number) => (
                 <div key={i} className={`flex gap-3 p-4 ${i > 0 ? "border-t border-border" : ""}`}>
-                  <div className="w-12 h-12 bg-secondary rounded-lg overflow-hidden flex-shrink-0">
-                    <img src={item.productImageUrl || item.productImage} alt={item.productName} className="w-full h-full object-cover" />
+                  <div className="h-12 w-12 flex-shrink-0 overflow-hidden border border-border bg-secondary p-1">
+                    <img src={item.productImageUrl || item.productImage} alt={item.productName} className="h-full w-full object-contain" />
                   </div>
                   <div className="flex-1">
                     <p className="font-semibold text-sm line-clamp-1">{item.productName}</p>
@@ -100,7 +100,7 @@ function OrderDetailSheet({ order, open, onOpenChange, onStatusUpdate }: {
             <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2 mb-3">
               <CreditCard className="w-3 h-3" /> Payment
             </h3>
-            <div className="bg-secondary/20 rounded-xl p-4 text-sm space-y-2">
+            <div className="space-y-2 border border-border/70 bg-secondary/20 p-4 text-sm">
               <div className="flex justify-between text-muted-foreground">
                 <span>Subtotal</span>
                 <span>{formatPrice(order.subtotal)}</span>
@@ -115,7 +115,7 @@ function OrderDetailSheet({ order, open, onOpenChange, onStatusUpdate }: {
                 <span>Shipping</span>
                 <span>{order.shippingCost === 0 ? "Free" : formatPrice(order.shippingCost)}</span>
               </div>
-              <div className="border-t border-border pt-2 flex justify-between font-bold">
+              <div className="flex justify-between border-t border-border pt-3 font-bold">
                 <span>Total</span>
                 <span className="text-accent">{formatPrice(order.total)}</span>
               </div>
@@ -127,7 +127,7 @@ function OrderDetailSheet({ order, open, onOpenChange, onStatusUpdate }: {
 
           <div>
             <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">Update Status</h3>
-            <div className="flex gap-2">
+            <div className="flex flex-col gap-2 sm:flex-row">
               <Input
                 value={trackingNumber}
                 onChange={(e) => setTrackingNumber(e.target.value)}
@@ -136,7 +136,7 @@ function OrderDetailSheet({ order, open, onOpenChange, onStatusUpdate }: {
               />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="font-display uppercase text-xs flex-shrink-0">
+                  <Button variant="outline" className="flex-shrink-0 font-display text-xs uppercase tracking-wide">
                     Status <ChevronDown className="w-3 h-3 ml-1" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -191,24 +191,25 @@ export default function AdminOrders() {
 
   return (
     <div>
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+      <div className="mb-7 flex flex-col items-start justify-between gap-4 border-b border-border pb-6 md:flex-row md:items-center">
         <div>
-          <h1 className="font-display font-bold text-4xl uppercase tracking-tight">Orders</h1>
-          <p className="text-muted-foreground mt-1">Manage and fulfill customer orders</p>
+          <p className="mb-2 text-[10px] font-black uppercase tracking-[0.24em] text-accent">NANO / 02</p>
+          <h1 className="font-display text-4xl font-black uppercase tracking-[-0.06em]">Orders</h1>
+          <p className="mt-2 text-sm text-muted-foreground">Manage and fulfill customer orders</p>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="relative">
+        <div className="flex w-full items-center gap-2 sm:w-auto sm:gap-3">
+          <div className="relative min-w-0 flex-1 sm:flex-none">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               placeholder="Search orders..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 w-48"
+              className="w-full border-border bg-card pl-9 sm:w-52"
             />
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="font-display uppercase tracking-wider text-xs">
+              <Button variant="outline" className="border-border bg-card font-display text-xs uppercase tracking-wider">
                 {statusFilter ?? "All Statuses"} <ChevronDown className="w-3 h-3 ml-2" />
               </Button>
             </DropdownMenuTrigger>
@@ -224,17 +225,17 @@ export default function AdminOrders() {
         </div>
       </div>
 
-      <div className="bg-card border border-border rounded-2xl overflow-hidden">
+      <div className="overflow-hidden border border-border bg-card/75 shadow-[0_16px_50px_rgba(0,0,0,0.12)]">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
-            <thead className="text-xs text-muted-foreground uppercase border-b border-border">
+            <thead className="border-b border-border text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
               <tr>
-                <th className="px-5 py-4 font-medium">Order</th>
-                <th className="px-5 py-4 font-medium">Date</th>
-                <th className="px-5 py-4 font-medium">Customer</th>
-                <th className="px-5 py-4 font-medium">Total</th>
-                <th className="px-5 py-4 font-medium">Status</th>
-                <th className="px-5 py-4 font-medium text-right">Actions</th>
+                <th className="px-4 py-4 font-bold md:px-5">Order</th>
+                <th className="px-4 py-4 font-bold md:px-5">Date</th>
+                <th className="px-4 py-4 font-bold md:px-5">Customer</th>
+                <th className="px-4 py-4 font-bold md:px-5">Total</th>
+                <th className="px-4 py-4 font-bold md:px-5">Status</th>
+                <th className="px-4 py-4 text-right font-bold md:px-5">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -242,7 +243,7 @@ export default function AdminOrders() {
                 Array.from({ length: 5 }).map((_, i) => (
                   <tr key={i} className="animate-pulse">
                     {Array.from({ length: 6 }).map((__, j) => (
-                      <td key={j} className="px-5 py-4"><div className="h-4 bg-secondary rounded" /></td>
+                      <td key={j} className="px-4 py-4 md:px-5"><div className="h-4 bg-secondary/80" /></td>
                     ))}
                   </tr>
                 ))
@@ -254,29 +255,29 @@ export default function AdminOrders() {
                 ordersData?.orders.map((order: any) => (
                   <tr
                     key={order.id}
-                    className="hover:bg-secondary/20 transition-colors cursor-pointer"
+                    className="cursor-pointer transition-colors hover:bg-white/[0.035]"
                     onClick={() => { setSelectedOrder(order); setIsSheetOpen(true); }}
                   >
-                    <td className="px-5 py-4 font-bold text-accent">
+                    <td className="px-4 py-5 font-bold text-accent md:px-5">
                       {order.orderNumber || `#${order.id.toString().padStart(6, "0")}`}
                     </td>
-                    <td className="px-5 py-4 text-muted-foreground">
+                    <td className="px-4 py-5 text-muted-foreground md:px-5">
                       {new Date(order.createdAt).toLocaleDateString("en-PK", { day: "numeric", month: "short" })}
                     </td>
-                    <td className="px-5 py-4">
+                    <td className="px-4 py-5 md:px-5">
                       <div className="font-medium">{order.customerName}</div>
                       <div className="text-xs text-muted-foreground">{order.city}</div>
                     </td>
-                    <td className="px-5 py-4 font-bold">{formatPrice(order.total)}</td>
-                    <td className="px-5 py-4">
-                      <span className={`px-2.5 py-1 border text-xs font-bold rounded-full capitalize ${STATUS_COLORS[order.status] || ""}`}>
+                    <td className="px-4 py-5 font-bold md:px-5">{formatPrice(order.total)}</td>
+                    <td className="px-4 py-5 md:px-5">
+                      <span className={`inline-flex border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${STATUS_COLORS[order.status] || "border-border bg-secondary text-muted-foreground"}`}>
                         {order.status}
                       </span>
                     </td>
-                    <td className="px-5 py-4 text-right" onClick={(e) => e.stopPropagation()}>
+                    <td className="px-4 py-5 text-right md:px-5" onClick={(e) => e.stopPropagation()}>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="outline" size="sm" className="font-display uppercase text-xs">
+                          <Button variant="outline" size="sm" className="border-border font-display text-xs uppercase tracking-wide">
                             Update <ChevronDown className="w-3 h-3 ml-1" />
                           </Button>
                         </DropdownMenuTrigger>

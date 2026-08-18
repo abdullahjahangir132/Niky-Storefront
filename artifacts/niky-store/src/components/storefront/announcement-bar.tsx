@@ -30,27 +30,32 @@ export default function AnnouncementBar() {
 
   if (dismissed || items.length === 0) return null;
 
-  // Duplicate enough times for a seamless infinite scroll
-  const repeated = [...items, ...items, ...items, ...items];
+  // Two identical groups are enough for a seamless loop. The animation travels
+  // exactly one group, so every configured item is shown once per cycle.
+  const repeated = [items, items];
 
   return (
-    <div className="relative bg-[#111111] text-white overflow-hidden h-9 flex items-center select-none">
-      <div className="flex animate-marquee whitespace-nowrap">
-        {repeated.map((item, i) => (
-          <span key={i} className="flex items-center flex-shrink-0">
-            <span className="text-[11px] font-semibold tracking-wider uppercase px-8">
-              {item}
-            </span>
-            <span className="text-accent/60 text-[10px]">•</span>
-          </span>
+    <div className="relative z-50 h-10 flex items-center overflow-hidden select-none bg-[#121214] text-white border-b border-white/10 marquee-viewport">
+      <div className="flex h-full w-max animate-marquee whitespace-nowrap hover:[animation-play-state:paused]">
+        {repeated.map((group, groupIndex) => (
+          <div key={groupIndex} className="marquee-group flex h-full shrink-0 items-center">
+            {group.map((item, itemIndex) => (
+              <span key={`${groupIndex}-${itemIndex}`} className="flex h-full items-center shrink-0">
+                <span className="px-7 text-[10px] font-bold uppercase tracking-[0.22em] text-white/80 sm:px-10">
+                  {item}
+                </span>
+                <span className="text-accent text-[11px]" aria-hidden="true">/</span>
+              </span>
+            ))}
+          </div>
         ))}
       </div>
       <button
         onClick={() => setDismissed(true)}
-        className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-colors z-10 p-1"
+        className="absolute right-2 top-1/2 z-10 flex h-7 w-7 -translate-y-1/2 items-center justify-center border border-white/15 bg-[#121214]/90 text-white/55 transition-colors hover:border-accent hover:text-white sm:right-4"
         aria-label="Dismiss announcement bar"
       >
-        <X className="w-3 h-3" />
+        <X className="h-3.5 w-3.5" />
       </button>
     </div>
   );

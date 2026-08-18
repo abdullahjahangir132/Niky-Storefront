@@ -6,11 +6,11 @@ import { Link } from "wouter";
 import { formatPrice } from "@/lib/utils";
 
 const STATUS_COLORS: Record<string, string> = {
-  pending: "bg-yellow-100 text-yellow-800",
-  confirmed: "bg-blue-100 text-blue-800",
-  shipped: "bg-purple-100 text-purple-800",
-  delivered: "bg-green-100 text-green-800",
-  cancelled: "bg-red-100 text-red-800",
+  pending: "border-amber-400/25 bg-amber-400/10 text-amber-300",
+  confirmed: "border-sky-400/25 bg-sky-400/10 text-sky-300",
+  shipped: "border-violet-400/25 bg-violet-400/10 text-violet-300",
+  delivered: "border-emerald-400/25 bg-emerald-400/10 text-emerald-300",
+  cancelled: "border-red-400/25 bg-red-400/10 text-red-300",
 };
 
 export default function AdminDashboard() {
@@ -20,14 +20,18 @@ export default function AdminDashboard() {
   const { data: monthlyRevenue } = useGetMonthlyRevenue();
 
   return (
-    <div>
-      <div className="mb-8">
-        <h1 className="font-display font-bold text-4xl uppercase tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground mt-1">Store performance overview</p>
+    <div className="mx-auto max-w-[1500px]">
+      <div className="mb-8 flex flex-col justify-between gap-3 border-b border-border pb-6 sm:flex-row sm:items-end">
+        <div>
+          <p className="mb-2 text-[10px] font-black uppercase tracking-[0.24em] text-accent">NANO / 01</p>
+          <h1 className="font-display text-4xl font-black uppercase tracking-[-0.06em] md:text-5xl">Dashboard</h1>
+          <p className="mt-2 text-sm text-muted-foreground">Store performance overview</p>
+        </div>
+        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">Live business pulse</p>
       </div>
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+      <div className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <KpiCard
           title="Total Revenue"
           value={stats ? formatPrice(stats.totalRevenue) : "—"}
@@ -52,35 +56,40 @@ export default function AdminDashboard() {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+      <div className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-3">
         {/* Revenue Chart */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle className="font-display uppercase tracking-wider text-sm">Monthly Revenue (PKR)</CardTitle>
+        <Card className="border-border/80 bg-card/80 lg:col-span-2">
+          <CardHeader className="flex flex-row items-start justify-between space-y-0 border-b border-border/70 pb-4">
+            <div>
+              <CardTitle className="font-display text-sm uppercase tracking-[0.12em]">Monthly Revenue (PKR)</CardTitle>
+              <p className="mt-1 text-xs text-muted-foreground">Last 12 months</p>
+            </div>
+            <span className="h-2 w-2 rounded-full bg-accent shadow-[0_0_0_4px_hsl(var(--accent)/0.12)]" />
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-5">
             <div className="h-[280px]">
               {monthlyRevenue && monthlyRevenue.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={monthlyRevenue} margin={{ top: 5, right: 10, left: 10, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
-                    <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 11 }} />
+                      <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
                     <YAxis
                       axisLine={false}
                       tickLine={false}
-                      tick={{ fontSize: 11 }}
+                        tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
                       tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`}
                     />
                     <Tooltip
-                      contentStyle={{ borderRadius: "8px", border: "none", boxShadow: "0 4px 20px rgba(0,0,0,0.15)", background: "hsl(var(--card))" }}
+                      contentStyle={{ borderRadius: "2px", border: "1px solid hsl(var(--border))", boxShadow: "0 14px 36px rgba(0,0,0,0.35)", background: "hsl(var(--card))", color: "hsl(var(--foreground))" }}
+                      labelStyle={{ color: "hsl(var(--muted-foreground))", fontSize: 11 }}
                       formatter={(value: number) => [formatPrice(value), "Revenue"]}
                     />
                     <Line
                       type="monotone"
                       dataKey="revenue"
                       stroke="hsl(var(--accent))"
-                      strokeWidth={2.5}
-                      dot={{ r: 3, fill: "hsl(var(--accent))" }}
+                      strokeWidth={3}
+                      dot={{ r: 3, fill: "hsl(var(--accent))", strokeWidth: 0 }}
                       activeDot={{ r: 5 }}
                     />
                   </LineChart>
@@ -95,22 +104,22 @@ export default function AdminDashboard() {
         </Card>
 
         {/* Top Products */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="font-display uppercase tracking-wider text-sm">Top Products</CardTitle>
+        <Card className="border-border/80 bg-card/80">
+          <CardHeader className="border-b border-border/70 pb-4">
+            <CardTitle className="font-display text-sm uppercase tracking-[0.12em]">Top Products</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-2 pt-4">
             {topProducts?.map((product: any, i: number) => (
-              <div key={product.id} className="flex items-center gap-3">
-                <span className="w-5 text-xs font-bold text-muted-foreground">{i + 1}</span>
-                <div className="w-10 h-10 bg-secondary rounded-lg overflow-hidden flex-shrink-0">
-                  <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
+              <div key={product.id} className="group flex items-center gap-3 border-b border-border/50 py-2 last:border-0">
+                <span className="w-5 text-xs font-bold text-muted-foreground">0{i + 1}</span>
+                <div className="h-10 w-10 flex-shrink-0 overflow-hidden border border-border bg-secondary p-1">
+                  <img src={product.imageUrl} alt={product.name} className="h-full w-full object-contain transition-transform group-hover:scale-105" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-sm truncate">{product.name}</p>
                   <p className="text-xs text-muted-foreground">{product.salesCount} sold</p>
                 </div>
-                <div className="font-bold text-sm text-right text-accent whitespace-nowrap">
+                <div className="whitespace-nowrap text-right text-sm font-bold text-accent">
                   {formatPrice(product.revenue)}
                 </div>
               </div>
@@ -123,10 +132,10 @@ export default function AdminDashboard() {
       </div>
 
       {/* Recent Orders */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="font-display uppercase tracking-wider text-sm">Recent Orders</CardTitle>
-          <Link href="/admin/orders" className="text-xs font-bold text-accent hover:underline uppercase tracking-wider">
+      <Card className="border-border/80 bg-card/80">
+        <CardHeader className="flex flex-row items-center justify-between border-b border-border/70 pb-4">
+          <CardTitle className="font-display text-sm uppercase tracking-[0.12em]">Recent Orders</CardTitle>
+          <Link href="/admin/orders" className="text-[10px] font-black uppercase tracking-[0.18em] text-accent transition-colors hover:text-foreground">
             View All
           </Link>
         </CardHeader>
@@ -134,30 +143,30 @@ export default function AdminDashboard() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-border text-xs text-muted-foreground uppercase">
-                  <th className="px-6 py-3 text-left font-medium">Order</th>
-                  <th className="px-6 py-3 text-left font-medium">Customer</th>
-                  <th className="px-6 py-3 text-left font-medium">Date</th>
-                  <th className="px-6 py-3 text-left font-medium">Status</th>
-                  <th className="px-6 py-3 text-right font-medium">Total</th>
+                <tr className="border-b border-border text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+                  <th className="px-5 py-4 text-left font-bold md:px-6">Order</th>
+                  <th className="px-5 py-4 text-left font-bold md:px-6">Customer</th>
+                  <th className="px-5 py-4 text-left font-bold md:px-6">Date</th>
+                  <th className="px-5 py-4 text-left font-bold md:px-6">Status</th>
+                  <th className="px-5 py-4 text-right font-bold md:px-6">Total</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
                 {recentOrders?.map((order: any) => (
-                  <tr key={order.id} className="hover:bg-secondary/20 transition-colors">
-                    <td className="px-6 py-4 font-bold text-accent">
+                  <tr key={order.id} className="transition-colors hover:bg-white/[0.035]">
+                    <td className="px-5 py-4 font-bold text-accent md:px-6">
                       {(order as any).orderNumber || `#${order.id.toString().padStart(6, "0")}`}
                     </td>
-                    <td className="px-6 py-4">{order.customerName}</td>
-                    <td className="px-6 py-4 text-muted-foreground">
+                    <td className="px-5 py-4 md:px-6">{order.customerName}</td>
+                    <td className="px-5 py-4 text-muted-foreground md:px-6">
                       {new Date(order.createdAt).toLocaleDateString("en-PK", { day: "numeric", month: "short" })}
                     </td>
-                    <td className="px-6 py-4">
-                      <span className={`px-2.5 py-1 text-xs font-bold rounded-full capitalize ${STATUS_COLORS[order.status] || ""}`}>
+                    <td className="px-5 py-4 md:px-6">
+                      <span className={`inline-flex border px-2.5 py-1 text-[10px] font-bold capitalize tracking-wide ${STATUS_COLORS[order.status] || "border-border bg-secondary text-muted-foreground"}`}>
                         {order.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-right font-bold">{formatPrice(order.total)}</td>
+                    <td className="px-5 py-4 text-right font-bold md:px-6">{formatPrice(order.total)}</td>
                   </tr>
                 ))}
                 {(!recentOrders || recentOrders.length === 0) && (
@@ -176,13 +185,13 @@ export default function AdminDashboard() {
 
 function KpiCard({ title, value, icon, trend }: { title: string; value: string; icon: React.ReactNode; trend?: number }) {
   return (
-    <Card>
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between mb-3">
-          <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{title}</p>
-          <div className="w-9 h-9 bg-accent/10 rounded-xl flex items-center justify-center">{icon}</div>
+    <Card className="group border-border/80 bg-card/80 transition-colors hover:border-accent/40">
+      <CardContent className="p-5 md:p-6">
+        <div className="mb-5 flex items-center justify-between">
+          <p className="text-[10px] font-black uppercase tracking-[0.18em] text-muted-foreground">{title}</p>
+          <div className="flex h-9 w-9 items-center justify-center border border-accent/20 bg-accent/10 transition-transform group-hover:-translate-y-0.5">{icon}</div>
         </div>
-        <div className="font-display font-bold text-2xl tracking-tight">{value}</div>
+        <div className="font-display text-2xl font-black tracking-[-0.04em] md:text-3xl">{value}</div>
         {trend !== undefined && (
           <p className={`text-xs flex items-center mt-2 ${trend >= 0 ? "text-green-600" : "text-red-500"}`}>
             {trend >= 0 ? <ArrowUpRight className="w-3 h-3 mr-1" /> : <ArrowDownRight className="w-3 h-3 mr-1" />}

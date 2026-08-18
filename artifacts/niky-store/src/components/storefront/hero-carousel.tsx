@@ -3,7 +3,6 @@ import { Link } from "wouter";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
 import { useListHeroSlides } from "@workspace/api-client-react";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const AUTOPLAY_MS = 6000;
@@ -84,7 +83,7 @@ export default function HeroCarousel() {
   const slide = slides[index] ?? FALLBACK_SLIDE;
 
   return (
-    <section className="relative h-screen min-h-[600px] w-full overflow-hidden bg-black flex items-center justify-center -mt-20">
+    <section className="relative -mt-20 flex min-h-[620px] h-[min(100dvh,880px)] w-full items-center justify-center overflow-hidden bg-[#09090a] pt-20">
       <AnimatePresence mode="sync">
         <motion.div
           key={slide.id ?? index}
@@ -95,11 +94,12 @@ export default function HeroCarousel() {
           className="absolute inset-0 z-0"
         >
           <SlideMedia slide={slide as any} />
-          <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-black/40" />
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(5,5,6,0.78)_0%,rgba(5,5,6,0.28)_52%,rgba(5,5,6,0.52)_100%)]" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#09090a] via-transparent to-[#09090a]/45" />
         </motion.div>
       </AnimatePresence>
 
-      <div className="relative z-10 text-center px-4 max-w-5xl mx-auto">
+      <div className="relative z-10 mx-auto max-w-5xl px-5 text-center sm:px-8">
         <AnimatePresence mode="wait">
           <motion.div
             key={slide.id ?? index}
@@ -109,31 +109,29 @@ export default function HeroCarousel() {
             transition={{ duration: 0.5 }}
           >
             {slide.subtitle && (
-              <p className="text-accent font-bold uppercase tracking-[0.3em] text-sm mb-4">{slide.subtitle}</p>
+              <p className="mb-4 text-[11px] font-black uppercase tracking-[0.28em] text-accent sm:text-sm">{slide.subtitle}</p>
             )}
             {slide.title && (
-              <h1 className="font-display font-black text-5xl md:text-7xl lg:text-8xl text-white uppercase tracking-tighter leading-none mb-6 whitespace-pre-line">
+                <h1 className="mb-6 whitespace-pre-line font-display text-5xl font-black uppercase leading-[0.9] tracking-[-0.07em] text-white sm:text-6xl md:text-7xl lg:text-8xl">
                 {slide.title}
               </h1>
             )}
             {(slide.ctaText || slide.secondaryCtaText) && (
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
+              <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
                 {slide.ctaText && (
-                  <Link href={slide.ctaLink || "/shop"}>
-                    <Button size="lg" className="h-14 px-10 rounded-full font-display text-lg uppercase tracking-wider w-full sm:w-auto">
-                      {slide.ctaText}
-                    </Button>
+                  <Link
+                    href={slide.ctaLink || "/shop"}
+                    className="flex h-14 w-full items-center justify-center bg-accent px-9 font-display text-sm font-black uppercase tracking-[0.16em] text-white transition-[transform,background-color] hover:-translate-y-0.5 hover:bg-accent/90 sm:w-auto"
+                  >
+                    {slide.ctaText}<span className="ml-3 text-lg leading-none">↗</span>
                   </Link>
                 )}
                 {slide.secondaryCtaText && (
-                  <Link href={slide.secondaryCtaLink || "/shop"}>
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      className="h-14 px-10 rounded-full font-display text-lg uppercase tracking-wider text-white border-white hover:bg-white hover:text-black w-full sm:w-auto bg-transparent"
-                    >
-                      {slide.secondaryCtaText}
-                    </Button>
+                  <Link
+                    href={slide.secondaryCtaLink || "/shop"}
+                    className="flex h-14 w-full items-center justify-center border border-white/60 bg-white/[0.04] px-9 font-display text-sm font-black uppercase tracking-[0.16em] text-white backdrop-blur-sm transition-[transform,background-color,border-color,color] hover:-translate-y-0.5 hover:border-white hover:bg-white hover:text-[#09090a] sm:w-auto"
+                  >
+                    {slide.secondaryCtaText}
                   </Link>
                 )}
               </div>
@@ -147,34 +145,34 @@ export default function HeroCarousel() {
           <button
             aria-label="Previous slide"
             onClick={prev}
-            className="hidden md:flex absolute left-4 lg:left-8 top-1/2 -translate-y-1/2 z-20 items-center justify-center w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm transition-colors"
+            className="absolute left-3 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center border border-white/25 bg-black/20 text-white backdrop-blur-md transition-colors hover:border-white/70 hover:bg-accent sm:left-5 sm:h-11 sm:w-11 lg:left-8"
           >
             <ChevronLeft size={22} />
           </button>
           <button
             aria-label="Next slide"
             onClick={next}
-            className="hidden md:flex absolute right-4 lg:right-8 top-1/2 -translate-y-1/2 z-20 items-center justify-center w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm transition-colors"
+            className="absolute right-3 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center border border-white/25 bg-black/20 text-white backdrop-blur-md transition-colors hover:border-white/70 hover:bg-accent sm:right-5 sm:h-11 sm:w-11 lg:right-8"
           >
             <ChevronRight size={22} />
           </button>
 
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex items-center gap-3">
+          <div className="absolute bottom-7 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2.5 sm:bottom-9 sm:gap-3">
             {slides.map((s, i) => (
               <button
                 key={s.id ?? i}
                 aria-label={`Go to slide ${i + 1}`}
                 onClick={() => goTo(i)}
                 className={cn(
-                  "h-1.5 rounded-full transition-all duration-300 bg-white/40",
-                  i === index ? "w-8 bg-white" : "w-4 hover:bg-white/70"
+                  "h-1 rounded-full bg-white/40 transition-all duration-300",
+                  i === index ? "w-10 bg-accent" : "w-5 hover:bg-white/80"
                 )}
               />
             ))}
             <button
               aria-label={playing ? "Pause slideshow" : "Play slideshow"}
               onClick={() => setPlaying((p) => !p)}
-              className="ml-2 w-7 h-7 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+              className="ml-1 flex h-8 w-8 items-center justify-center border border-white/20 bg-black/20 text-white transition-colors hover:border-white/60 hover:bg-white/15"
             >
               {playing ? <Pause size={12} /> : <Play size={12} />}
             </button>

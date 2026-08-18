@@ -1,0 +1,37 @@
+Act as a Senior UI/UX Designer and Frontend Specialist. 
+
+Your goal is to perform a comprehensive visual and UX polish on the front-end interface and Admin Dashboard of this e-commerce project. 
+
+CRITICAL RULE: DO NOT modify, rewrite, or break any existing backend logic, API routes, database schemas, state management, or functionality. ONLY update HTML structure, CSS/Tailwind classes, inline styling, and UI components to improve visual aesthetics and user experience.
+
+Apply the following specific UI/UX enhancements:
+
+1. Top Announcement Bar:
+   - Fix duplicated marquee/announcement text. Ensure each announcement item (Helpline, Free Shipping, New Collection) appears ONCE with clean spacing, icons, and consistent padding.
+
+2. Navigation Header & Mega Menu:
+   - Ensure proper contrast, typography hierarchy, and equal spacing between navigation links (Men, Women, Kids, All Products).
+   - Align search, profile, and cart icons cleanly with consistent right-margin padding.
+   - Improve the Mega Menu dropdown: Add proper inner padding, clean borders, smooth hover state background highlights, and better typography hierarchy for subcategories.
+
+3. Hero Banners & Slider Controls:
+   - Add a subtle dark gradient overlay over hero background images to ensure hero text ("PAKISTAN'S PREMIUM FOOTWEAR", "NANO FOOTBALL PRESENTS") is 100% legible against any background image.
+   - Refine hero buttons ("SHOP NOW", "SALES") with consistent height, padding, modern glassmorphism or high-contrast solid borders, and smooth hover micro-interactions.
+   - Style the slider navigation arrows and pagination dots so they look modern, floating, and clean.
+
+4. Product Cards & Grid Layout:
+   - Standardize all product card images to a uniform aspect ratio (e.g., 4:3 or 1:1) with object-fit: cover/contain so all product images align evenly.
+   - Add subtle light background containers or cards around transparent image PNGs for consistency.
+   - Polish badges like "SALE" and "NEW": place them inside the card with proper offset padding, rounded borders, and clean typography.
+   - Ensure product titles, prices, and hover actions (View Details / Add to Cart) are perfectly aligned across all cards in the grid.
+
+5. Category Cards & Banners:
+   - Add subtle hover scale effects on category cards (Men, Women, Kids) with smooth CSS transitions.
+   - Clean up font sizes and bottom gradient overlays on category banners so text like "Shop Collection ->" is crisp and clear.
+
+6. Admin Dashboard Aesthetics:
+   - Enhance table padding, row hover effects, and typography in the "Recent Orders" section.
+   - Style status badges ("Confirmed", "Shipped") with soft background pills and distinct status colors for high contrast.
+   - Clean up line charts, metric cards, and sidebar alignment for a sleek modern dark-mode admin panel look.
+
+Make sure the entire website remains fully responsive across Mobile, Tablet, and Desktop screens. Maintain the black/red/white brand color palette consistently throughout.

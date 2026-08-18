@@ -45,37 +45,33 @@
 }
 
 :root {
-  --background: 0 0% 4%;
-  --foreground: 0 0% 98%;
-  --border: 0 0% 15%;
-  
-  --card: 0 0% 6%;
-  --card-foreground: 0 0% 98%;
-  --card-border: 0 0% 12%;
-
-  --popover: 0 0% 6%;
-  --popover-foreground: 0 0% 98%;
-  --popover-border: 0 0% 12%;
-
-  --primary: 0 0% 98%;
-  --primary-foreground: 0 0% 4%;
-
+  --background: 0 0% 5%;
+  --foreground: 0 0% 96%;
+  --border: 0 0% 17%;
+  --card: 0 0% 8%;
+  --card-foreground: 0 0% 96%;
+  --card-border: 0 0% 16%;
+  --popover: 0 0% 8%;
+  --popover-foreground: 0 0% 96%;
+  --popover-border: 0 0% 18%;
+  --primary: 0 0% 96%;
+  --primary-foreground: 0 0% 7%;
   --secondary: 0 0% 12%;
-  --secondary-foreground: 0 0% 98%;
-
+  --secondary-foreground: 0 0% 96%;
   --muted: 0 0% 12%;
-  --muted-foreground: 0 0% 65%;
-
-  --accent: 350 85% 55%; /* Bold Red */
+  --muted-foreground: 0 0% 62%;
+  --accent: 352 82% 51%;
   --accent-foreground: 0 0% 100%;
-
-  --destructive: 0 84% 60%;
+  --destructive: 0 72% 48%;
   --destructive-foreground: 0 0% 100%;
-
-  --input: 0 0% 15%;
-  --ring: 0 0% 98%;
-
-  --radius: 0rem;
+  --input: 0 0% 19%;
+  --ring: 352 82% 51%;
+  --sidebar: 0 0% 6%;
+  --sidebar-foreground: 0 0% 92%;
+  --sidebar-accent: 0 0% 12%;
+  --sidebar-accent-foreground: 0 0% 98%;
+  --sidebar-border: 0 0% 15%;
+  --radius: 0.2rem;
 }
 
 @keyframes marquee {
@@ -89,11 +85,39 @@
 }
 
 .animate-marquee {
-  animation: marquee 25s linear infinite;
+  animation: marquee 28s linear infinite;
+  will-change: transform;
 }
 
 .animate-marquee-reverse {
   animation: marquee-reverse 25s linear infinite;
+}
+
+.marquee-viewport {
+  mask-image: linear-gradient(90deg, transparent, black 5%, black 95%, transparent);
+}
+
+.marquee-group {
+  min-width: 100vw;
+}
+
+.hairline-grid {
+  background-image: linear-gradient(hsl(var(--border) / 0.32) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--border) / 0.32) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.admin-shell {
+  background:
+    radial-gradient(circle at 88% 0%, hsl(var(--accent) / 0.08), transparent 26rem),
+    hsl(var(--background));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee,
+  .animate-marquee-reverse {
+    animation-play-state: paused;
+  }
 }
 
 @layer base {
