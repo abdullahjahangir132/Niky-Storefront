@@ -38,7 +38,7 @@ export default function TagScrollBar() {
   const repeated = [...items, ...items, ...items, ...items];
 
   return (
-    <div className="bg-[#1a1a1a] border-y border-white/5 overflow-hidden h-14 flex items-center">
+    <div className="flex h-14 items-center overflow-hidden border-y border-white/10 bg-[#1a1a1a]">
       <div className="flex animate-marquee whitespace-nowrap">
         {repeated.map((item, i) => (
           <Link

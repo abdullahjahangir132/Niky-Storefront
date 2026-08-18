@@ -59,7 +59,7 @@
   --secondary: 0 0% 12%;
   --secondary-foreground: 0 0% 96%;
   --muted: 0 0% 12%;
-  --muted-foreground: 0 0% 62%;
+  --muted-foreground: 0 0% 72%;
   --accent: 352 82% 51%;
   --accent-foreground: 0 0% 100%;
   --destructive: 0 72% 48%;
@@ -71,7 +71,8 @@
   --sidebar-accent: 0 0% 12%;
   --sidebar-accent-foreground: 0 0% 98%;
   --sidebar-border: 0 0% 15%;
-  --radius: 0.2rem;
+  /* One shared radius keeps cards, controls, and media wrappers visually related. */
+  --radius: 0.75rem;
 }
 
 @keyframes marquee {
@@ -130,4 +131,16 @@
   h1, h2, h3, h4, h5, h6 {
     @apply font-display tracking-tight uppercase font-bold;
   }
+}
+
+/* Keep the visual language consistent even when older screens use a different
+   rounded utility. Full pills/circles remain intentionally available for
+   badges, avatars, and status indicators. */
+:where(.rounded, .rounded-sm, .rounded-md, .rounded-lg, .rounded-xl, .rounded-2xl, .rounded-3xl) {
+  border-radius: 0.75rem !important;
+}
+
+/* CTA buttons should not fall back to the old pill silhouette. */
+:where(button.rounded-full, a.rounded-full) {
+  border-radius: 0.75rem !important;
 }

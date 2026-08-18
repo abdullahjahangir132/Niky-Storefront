@@ -59,11 +59,11 @@ export default function ProductDetail() {
     return (
       <div className="container mx-auto px-4 py-12">
         <div className="flex flex-col lg:flex-row gap-12 animate-pulse">
-          <div className="lg:w-3/5 bg-secondary rounded-2xl aspect-[4/5]" />
+          <div className="lg:w-3/5 aspect-[4/5] rounded-xl bg-secondary" />
           <div className="lg:w-2/5 space-y-6 pt-8">
-            <div className="h-8 bg-secondary rounded w-3/4" />
-            <div className="h-6 bg-secondary rounded w-1/4" />
-            <div className="h-32 bg-secondary rounded w-full" />
+            <div className="h-8 w-3/4 rounded-xl bg-secondary" />
+            <div className="h-6 w-1/4 rounded-xl bg-secondary" />
+            <div className="h-32 w-full rounded-xl bg-secondary" />
           </div>
         </div>
       </div>
@@ -133,7 +133,7 @@ export default function ProductDetail() {
               </button>
             ))}
           </div>
-          <div className="flex-1 bg-secondary/20 rounded-2xl overflow-hidden aspect-[4/5] flex items-center justify-center">
+          <div className="flex-1 aspect-[4/5] overflow-hidden rounded-xl border border-border bg-secondary/20 flex items-center justify-center">
             <motion.img
               key={currentImage}
               initial={{ opacity: 0, scale: 0.97 }}
@@ -171,7 +171,7 @@ export default function ProductDetail() {
               <div className="flex items-center gap-3">
                 <span className="text-accent">{formatPrice(product.salePrice)}</span>
                 <span className="text-muted-foreground line-through text-lg">{formatPrice(product.price)}</span>
-                <span className="text-xs bg-accent/10 text-accent font-bold px-2 py-1 rounded">
+                <span className="rounded-lg bg-accent px-2 py-1 text-xs font-bold text-white">
                   Save {Math.round(((product.price - product.salePrice) / product.price) * 100)}%
                 </span>
               </div>
@@ -228,7 +228,7 @@ export default function ProductDetail() {
           <div className="flex flex-col gap-3 mb-8">
             <Button
               size="lg"
-              className="h-14 rounded-full font-display text-lg uppercase tracking-wider w-full"
+              className="h-14 rounded-xl bg-accent font-display text-lg uppercase tracking-wider text-white hover:bg-accent/90 w-full"
               onClick={handleAddToCart}
             >
               Add to Cart
@@ -236,7 +236,7 @@ export default function ProductDetail() {
             <Button
               variant="outline"
               size="lg"
-              className={`h-14 rounded-full font-display text-lg uppercase tracking-wider w-full ${isInWishlist ? "border-accent text-accent" : ""}`}
+              className={`h-14 rounded-xl font-display text-lg uppercase tracking-wider w-full ${isInWishlist ? "border-accent bg-accent text-white hover:bg-accent/90" : ""}`}
               onClick={handleWishlist}
             >
               <Heart className={`w-5 h-5 mr-2 ${isInWishlist ? "fill-accent" : ""}`} />
@@ -281,7 +281,7 @@ export default function ProductDetail() {
           {reviewsData && reviewsData.reviews.length > 0 ? (
             <div className="space-y-6 mb-12">
               {reviewsData.reviews.map((review: any) => (
-                <div key={review.id} className="border border-border rounded-xl p-6">
+                <div key={review.id} className="rounded-xl border border-border p-6">
                   <div className="flex items-start justify-between mb-3">
                     <div>
                       <p className="font-bold">{review.reviewerName}</p>

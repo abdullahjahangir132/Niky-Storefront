@@ -45,7 +45,7 @@ export function AdminSidebar({ mobileOpen = false, onClose }: { mobileOpen?: boo
               href={link.href}
               onClick={onClose}
               aria-current={isActive ? "page" : undefined}
-              className={`group relative flex items-center gap-3 rounded-md px-3.5 py-3 text-sm font-medium transition-colors ${
+               className={`group relative flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-medium transition-colors ${
                 isActive
                   ? "bg-accent text-white shadow-[0_8px_20px_hsl(var(--accent)/0.18)]"
                   : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
@@ -60,7 +60,7 @@ export function AdminSidebar({ mobileOpen = false, onClose }: { mobileOpen?: boo
       </nav>
 
       <div className="border-t border-sidebar-border p-3">
-        <Link href="/" onClick={onClose} className="flex items-center gap-3 rounded-md px-3.5 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
+         <Link href="/" onClick={onClose} className="flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
           <LogOut className="h-[18px] w-[18px]" />
           Exit to Store
         </Link>

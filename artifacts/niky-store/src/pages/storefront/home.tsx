@@ -50,9 +50,9 @@ export default function Home() {
             { label: "Women", href: "/collections/women", img: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=800&q=80" },
             { label: "Kids", href: "/collections/kids", img: "https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=800&q=80" },
           ].map(({ label, href, img }) => (
-            <Link key={label} href={href} className="group relative block h-72 overflow-hidden border border-border bg-secondary/20 md:h-96">
+            <Link key={label} href={href} className="group relative block h-72 overflow-hidden rounded-xl border border-border bg-secondary/20 md:h-96">
               <img src={img} alt={label} className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105" />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#09090a]/90 via-[#09090a]/20 to-transparent transition-opacity duration-500 group-hover:from-[#09090a]/75" />
+              <div className="absolute inset-0 bg-black/60 transition-colors duration-500 group-hover:bg-black/50" />
               <div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-6 md:p-8">
                 <div>
                   <h3 className="font-display text-4xl font-black uppercase tracking-[-0.06em] text-white">{label}</h3>
@@ -60,7 +60,7 @@ export default function Home() {
                     Shop Collection <ArrowRight className="w-3 h-3" />
                   </p>
                 </div>
-                <span className="flex h-9 w-9 translate-y-2 items-center justify-center border border-white/30 text-white opacity-0 transition-[transform,opacity] duration-300 group-hover:translate-y-0 group-hover:opacity-100">↗</span>
+                <span className="flex h-9 w-9 translate-y-2 items-center justify-center rounded-xl border-2 border-white text-white opacity-0 transition-[transform,opacity] duration-300 group-hover:translate-y-0 group-hover:opacity-100">↗</span>
               </div>
             </Link>
           ))}
@@ -122,7 +122,7 @@ export default function Home() {
             From the streets of Lahore to the runways of Karachi — NANO SHOES engineers footwear that performs as hard as Pakistan hustles. Every pair is designed for the relentless.
           </p>
           <Link href="/about">
-            <Button variant="outline" className="h-12 px-8 rounded-full font-display uppercase tracking-wider">
+             <Button variant="outline" className="h-12 px-8 rounded-xl font-display uppercase tracking-wider">
               Our Story <ArrowRight className="ml-2 w-4 h-4" />
             </Button>
           </Link>
@@ -135,19 +135,19 @@ export default function Home() {
 function ProductCard({ product }: { product: any }) {
   return (
     <Link href={`/product/${product.slug}`} className="group block">
-      <div className="relative mb-4 aspect-[4/5] overflow-hidden border border-border bg-[#171719]">
+      <div className="relative mb-4 aspect-[4/5] overflow-hidden rounded-xl border border-border bg-[#171719]">
         <img
           src={product.imageUrl}
           alt={product.name}
           className="h-full w-full object-contain p-4 mix-blend-normal transition-transform duration-500 ease-out group-hover:scale-105 sm:p-6"
         />
         {product.isNew && !product.salePrice && (
-          <div className="absolute left-3 top-3 border border-foreground/20 bg-foreground px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.16em] text-background">
+          <div className="absolute left-3 top-3 rounded-lg border border-foreground/20 bg-foreground px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.16em] text-background">
             New
           </div>
         )}
         {product.salePrice && (
-          <div className="absolute left-3 top-3 bg-accent px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.16em] text-white">
+          <div className="absolute left-3 top-3 rounded-lg bg-accent px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.16em] text-white">
             Sale
           </div>
         )}
@@ -178,7 +178,7 @@ function ProductCard({ product }: { product: any }) {
 function ProductSkeleton() {
   return (
     <div className="animate-pulse">
-      <div className="mb-4 aspect-[4/5] border border-border bg-secondary/60" />
+      <div className="mb-4 aspect-[4/5] rounded-xl border border-border bg-secondary/60" />
       <div className="mb-2 h-2.5 w-1/3 bg-secondary/70" />
       <div className="h-4 w-4/5 bg-secondary/70" />
       <div className="mt-3 h-4 w-1/4 bg-secondary/70" />

@@ -251,7 +251,7 @@ export default function Checkout() {
               <Button
                 type="submit"
                 size="lg"
-                className="w-full h-14 font-display text-lg uppercase tracking-wider rounded-full"
+                className="w-full h-14 rounded-xl bg-accent font-display text-lg uppercase tracking-wider text-white hover:bg-accent/90"
                 disabled={createOrder.isPending}
               >
                 {createOrder.isPending ? "Placing Order..." : `Place Order — ${formatPrice(total)}`}
@@ -262,13 +262,13 @@ export default function Checkout() {
 
         {/* Order Summary */}
         <div className="lg:w-2/5">
-          <div className="bg-secondary/20 rounded-2xl border border-border p-6 sticky top-24">
+          <div className="sticky top-24 rounded-xl border border-border bg-secondary/20 p-6">
             <h2 className="font-display font-bold text-xl uppercase tracking-tight mb-6">Order Summary</h2>
 
             <div className="space-y-4 max-h-64 overflow-y-auto mb-6 pr-2">
               {items.map((item) => (
                 <div key={item.id} className="flex gap-3">
-                  <div className="w-16 h-16 bg-secondary rounded-lg overflow-hidden flex-shrink-0">
+                  <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-xl bg-secondary">
                     <img src={item.productImageUrl} alt={item.productName} className="w-full h-full object-cover" />
                   </div>
                   <div className="flex-1 text-sm">

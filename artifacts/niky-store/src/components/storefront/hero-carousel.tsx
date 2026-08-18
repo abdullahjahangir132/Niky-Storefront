@@ -94,8 +94,7 @@ export default function HeroCarousel() {
           className="absolute inset-0 z-0"
         >
           <SlideMedia slide={slide as any} />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(5,5,6,0.78)_0%,rgba(5,5,6,0.28)_52%,rgba(5,5,6,0.52)_100%)]" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#09090a] via-transparent to-[#09090a]/45" />
+          <div className="absolute inset-0 bg-black/60" />
         </motion.div>
       </AnimatePresence>
 
@@ -121,7 +120,7 @@ export default function HeroCarousel() {
                 {slide.ctaText && (
                   <Link
                     href={slide.ctaLink || "/shop"}
-                    className="flex h-14 w-full items-center justify-center bg-accent px-9 font-display text-sm font-black uppercase tracking-[0.16em] text-white transition-[transform,background-color] hover:-translate-y-0.5 hover:bg-accent/90 sm:w-auto"
+                    className="flex h-14 w-full items-center justify-center rounded-xl bg-accent px-9 font-display text-sm font-black uppercase tracking-[0.16em] text-white transition-[transform,background-color] hover:-translate-y-0.5 hover:bg-accent/90 sm:w-auto"
                   >
                     {slide.ctaText}<span className="ml-3 text-lg leading-none">↗</span>
                   </Link>
@@ -129,7 +128,7 @@ export default function HeroCarousel() {
                 {slide.secondaryCtaText && (
                   <Link
                     href={slide.secondaryCtaLink || "/shop"}
-                    className="flex h-14 w-full items-center justify-center border border-white/60 bg-white/[0.04] px-9 font-display text-sm font-black uppercase tracking-[0.16em] text-white backdrop-blur-sm transition-[transform,background-color,border-color,color] hover:-translate-y-0.5 hover:border-white hover:bg-white hover:text-[#09090a] sm:w-auto"
+                    className="flex h-14 w-full items-center justify-center rounded-xl bg-white px-9 font-display text-sm font-black uppercase tracking-[0.16em] text-[#09090a] transition-[transform,background-color] hover:-translate-y-0.5 hover:bg-accent hover:text-white sm:w-auto"
                   >
                     {slide.secondaryCtaText}
                   </Link>
@@ -145,14 +144,14 @@ export default function HeroCarousel() {
           <button
             aria-label="Previous slide"
             onClick={prev}
-            className="absolute left-3 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center border border-white/25 bg-black/20 text-white backdrop-blur-md transition-colors hover:border-white/70 hover:bg-accent sm:left-5 sm:h-11 sm:w-11 lg:left-8"
+            className="absolute left-3 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-xl border-2 border-white bg-black/60 text-white backdrop-blur-md transition-colors hover:border-accent hover:bg-accent sm:left-5 sm:h-11 sm:w-11 lg:left-8"
           >
             <ChevronLeft size={22} />
           </button>
           <button
             aria-label="Next slide"
             onClick={next}
-            className="absolute right-3 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center border border-white/25 bg-black/20 text-white backdrop-blur-md transition-colors hover:border-white/70 hover:bg-accent sm:right-5 sm:h-11 sm:w-11 lg:right-8"
+            className="absolute right-3 top-1/2 z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-xl border-2 border-white bg-black/60 text-white backdrop-blur-md transition-colors hover:border-accent hover:bg-accent sm:right-5 sm:h-11 sm:w-11 lg:right-8"
           >
             <ChevronRight size={22} />
           </button>
@@ -172,7 +171,7 @@ export default function HeroCarousel() {
             <button
               aria-label={playing ? "Pause slideshow" : "Play slideshow"}
               onClick={() => setPlaying((p) => !p)}
-              className="ml-1 flex h-8 w-8 items-center justify-center border border-white/20 bg-black/20 text-white transition-colors hover:border-white/60 hover:bg-white/15"
+                 className="ml-1 flex h-8 w-8 items-center justify-center rounded-xl border-2 border-white bg-black/60 text-white transition-colors hover:border-accent hover:bg-accent"
             >
               {playing ? <Pause size={12} /> : <Play size={12} />}
             </button>

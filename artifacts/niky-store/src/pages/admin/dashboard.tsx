@@ -80,7 +80,7 @@ export default function AdminDashboard() {
                       tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`}
                     />
                     <Tooltip
-                      contentStyle={{ borderRadius: "2px", border: "1px solid hsl(var(--border))", boxShadow: "0 14px 36px rgba(0,0,0,0.35)", background: "hsl(var(--card))", color: "hsl(var(--foreground))" }}
+                       contentStyle={{ borderRadius: "12px", border: "1px solid hsl(var(--border))", boxShadow: "0 14px 36px rgba(0,0,0,0.35)", background: "hsl(var(--card))", color: "hsl(var(--foreground))" }}
                       labelStyle={{ color: "hsl(var(--muted-foreground))", fontSize: 11 }}
                       formatter={(value: number) => [formatPrice(value), "Revenue"]}
                     />
@@ -112,7 +112,7 @@ export default function AdminDashboard() {
             {topProducts?.map((product: any, i: number) => (
               <div key={product.id} className="group flex items-center gap-3 border-b border-border/50 py-2 last:border-0">
                 <span className="w-5 text-xs font-bold text-muted-foreground">0{i + 1}</span>
-                <div className="h-10 w-10 flex-shrink-0 overflow-hidden border border-border bg-secondary p-1">
+                 <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-xl border border-border bg-secondary p-1">
                   <img src={product.imageUrl} alt={product.name} className="h-full w-full object-contain transition-transform group-hover:scale-105" />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -189,7 +189,7 @@ function KpiCard({ title, value, icon, trend }: { title: string; value: string; 
       <CardContent className="p-5 md:p-6">
         <div className="mb-5 flex items-center justify-between">
           <p className="text-[10px] font-black uppercase tracking-[0.18em] text-muted-foreground">{title}</p>
-          <div className="flex h-9 w-9 items-center justify-center border border-accent/20 bg-accent/10 transition-transform group-hover:-translate-y-0.5">{icon}</div>
+           <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-accent/20 bg-accent/10 transition-transform group-hover:-translate-y-0.5">{icon}</div>
         </div>
         <div className="font-display text-2xl font-black tracking-[-0.04em] md:text-3xl">{value}</div>
         {trend !== undefined && (

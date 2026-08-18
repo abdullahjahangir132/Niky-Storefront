@@ -186,13 +186,13 @@ export default function Shop() {
           {productsData?.products.map((product, index) => (
             <motion.div key={product.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: Math.min(index * 0.04, 0.3) }}>
               <Link href={`/product/${product.slug}`} className="group block">
-                <div className="relative aspect-[4/5] bg-secondary/30 rounded-xl overflow-hidden mb-4">
-                  <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                   <div className="relative mb-4 aspect-[4/5] overflow-hidden rounded-xl border border-border bg-[#171719]">
+                   <img src={product.imageUrl} alt={product.name} className="h-full w-full object-contain p-4 transition-transform duration-700 group-hover:scale-105 sm:p-6" />
                   {product.isNew && !product.salePrice && (
-                    <div className="absolute top-3 left-3 bg-foreground text-background text-[10px] font-black px-2.5 py-1 uppercase tracking-widest">New</div>
+                     <div className="absolute left-3 top-3 rounded-lg bg-foreground px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-background">New</div>
                   )}
                   {product.salePrice && (
-                    <div className="absolute top-3 left-3 bg-accent text-white text-[10px] font-black px-2.5 py-1 uppercase tracking-widest">Sale</div>
+                     <div className="absolute left-3 top-3 rounded-lg bg-accent px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-white">Sale</div>
                   )}
                 </div>
                 <div>
