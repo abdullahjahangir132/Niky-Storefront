@@ -211,7 +211,7 @@ function MultiImagesField({
 }
 
 export default function AdminProductForm() {
-  const [, params] = useRoute("/admin/products/:id/edit");
+  const [, params] = useRoute("/admin132/products/:id/edit");
   const isEdit = !!params?.id;
   const productId = parseInt(params?.id || "0");
   const [, setLocation] = useLocation();
@@ -226,14 +226,14 @@ export default function AdminProductForm() {
 
   const createProduct = useCreateProduct({
     mutation: {
-      onSuccess: () => { toast({ title: "Product created" }); setLocation("/admin/products"); },
+      onSuccess: () => { toast({ title: "Product created" }); setLocation("/admin132/products"); },
       onError: () => toast({ title: "Error creating product", variant: "destructive" }),
     },
   });
 
   const updateProduct = useUpdateProduct({
     mutation: {
-      onSuccess: () => { toast({ title: "Product updated" }); setLocation("/admin/products"); },
+      onSuccess: () => { toast({ title: "Product updated" }); setLocation("/admin132/products"); },
       onError: () => toast({ title: "Error updating product", variant: "destructive" }),
     },
   });
@@ -326,7 +326,7 @@ export default function AdminProductForm() {
   return (
     <div className="max-w-3xl mx-auto">
       <div className="flex items-center gap-4 mb-8">
-        <Link href="/admin/products">
+        <Link href="/admin132/products">
           <Button variant="ghost" size="icon">
             <ArrowLeft className="w-5 h-5" />
           </Button>
@@ -594,7 +594,7 @@ export default function AdminProductForm() {
           </div>
 
           <div className="flex justify-end gap-3">
-            <Button type="button" variant="outline" onClick={() => setLocation("/admin/products")}>Cancel</Button>
+            <Button type="button" variant="outline" onClick={() => setLocation("/admin132/products")}>Cancel</Button>
             <Button type="submit" disabled={createProduct.isPending || updateProduct.isPending} className="font-display uppercase tracking-wider px-8">
               {isEdit ? "Update Product" : "Create Product"}
             </Button>

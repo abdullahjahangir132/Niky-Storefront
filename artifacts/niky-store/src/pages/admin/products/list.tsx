@@ -37,7 +37,7 @@ export default function AdminProducts() {
           <h1 className="font-display font-bold text-4xl uppercase tracking-tight">Products</h1>
           <p className="text-muted-foreground mt-1">{productsData?.total ?? "—"} products in catalog</p>
         </div>
-        <Link href="/admin/products/new">
+        <Link href="/admin132/products/new">
           <Button className="font-display uppercase tracking-wider">
             <Plus className="w-4 h-4 mr-2" /> Add Product
           </Button>
@@ -132,7 +132,7 @@ export default function AdminProducts() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem asChild>
-                            <Link href={`/admin/products/${product.id}/edit`} className="cursor-pointer flex items-center">
+                            <Link href={`/admin132/products/${product.id}/edit`} className="cursor-pointer flex items-center">
                               <Edit2 className="w-4 h-4 mr-2" /> Edit
                             </Link>
                           </DropdownMenuItem>

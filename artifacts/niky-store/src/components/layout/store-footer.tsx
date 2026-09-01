@@ -1,13 +1,13 @@
 import { Link } from "wouter";
-import { useGetSettings } from "@workspace/api-client-react";
 import { Instagram, Facebook, Phone, MessageCircle, Store, Smartphone, Globe } from "lucide-react";
+import { useStoreSettings } from "@/hooks/use-store-settings";
 
 export default function StoreFooter() {
-  const { data: settings } = useGetSettings();
+  const { data: settings } = useStoreSettings();
 
   const s = settings as any;
   const logoUrl = s?.logoUrl || "";
-  const storeName = s?.storeName || "NANO SHOES";
+  const storeName = s?.storeName?.trim() || "NANO SHOES";
   const contactPhone = s?.contactPhone || "+92 300 1234567";
   const whatsappNumber = s?.whatsappNumber || "";
   const facebookUrl = s?.facebookUrl || "";
@@ -124,9 +124,7 @@ export default function StoreFooter() {
               {logoUrl ? (
                 <img src={logoUrl} alt={storeName} className="h-10 max-w-[160px] object-contain" />
               ) : (
-                <span className="font-display font-bold text-2xl tracking-tighter">
-                  NANO<span className="text-accent">SHOES</span>
-                </span>
+                <span className="font-display font-bold text-2xl tracking-tighter">{storeName}</span>
               )}
             </Link>
             <p className="text-gray-400 text-sm max-w-xs mb-5 leading-relaxed">

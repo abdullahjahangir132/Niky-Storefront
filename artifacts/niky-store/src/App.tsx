@@ -70,21 +70,21 @@ function App() {
                 <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
                   <Switch>
                     {/* Admin login — standalone, no layout */}
-                    <Route path="/admin/login" component={AdminLogin} />
+                    <Route path="/admin132/login" component={AdminLogin} />
 
                     {/* Admin routes — protected + AdminLayout (most specific first) */}
-                    <Route path="/admin/products/new" component={() => <AdminWrapper component={AdminProductForm} />} />
-                    <Route path="/admin/products/:id/edit" component={() => <AdminWrapper component={AdminProductForm} />} />
-                    <Route path="/admin/products" component={() => <AdminWrapper component={AdminProducts} />} />
-                    <Route path="/admin/orders" component={() => <AdminWrapper component={AdminOrders} />} />
-                    <Route path="/admin/categories" component={() => <AdminWrapper component={AdminCategories} />} />
-                    <Route path="/admin/customers" component={() => <AdminWrapper component={AdminCustomers} />} />
-                    <Route path="/admin/coupons" component={() => <AdminWrapper component={AdminCoupons} />} />
-                    <Route path="/admin/settings" component={() => <AdminWrapper component={AdminSettings} />} />
-                    <Route path="/admin/themes" component={() => <AdminWrapper component={AdminThemes} />} />
-                    <Route path="/admin/hero-slides" component={() => <AdminWrapper component={AdminHeroSlides} />} />
-                    <Route path="/admin/ai-usage" component={() => <AdminWrapper component={AdminAiUsage} />} />
-                    <Route path="/admin" component={() => <AdminWrapper component={AdminDashboard} />} />
+                    <Route path="/admin132/products/new" component={() => <AdminWrapper component={AdminProductForm} />} />
+                    <Route path="/admin132/products/:id/edit" component={() => <AdminWrapper component={AdminProductForm} />} />
+                    <Route path="/admin132/products" component={() => <AdminWrapper component={AdminProducts} />} />
+                    <Route path="/admin132/orders" component={() => <AdminWrapper component={AdminOrders} />} />
+                    <Route path="/admin132/categories" component={() => <AdminWrapper component={AdminCategories} />} />
+                    <Route path="/admin132/customers" component={() => <AdminWrapper component={AdminCustomers} />} />
+                    <Route path="/admin132/coupons" component={() => <AdminWrapper component={AdminCoupons} />} />
+                    <Route path="/admin132/settings" component={() => <AdminWrapper component={AdminSettings} />} />
+                    <Route path="/admin132/themes" component={() => <AdminWrapper component={AdminThemes} />} />
+                    <Route path="/admin132/hero-slides" component={() => <AdminWrapper component={AdminHeroSlides} />} />
+                    <Route path="/admin132/ai-usage" component={() => <AdminWrapper component={AdminAiUsage} />} />
+                    <Route path="/admin132" component={() => <AdminWrapper component={AdminDashboard} />} />
 
                     {/* Storefront — catch-all (must be last in Switch) */}
                     <Route>

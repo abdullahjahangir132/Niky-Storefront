@@ -16,7 +16,7 @@ export default function AdminLogin() {
     login(
       { data: { password } },
       {
-        onSuccess: () => setLocation("/admin"),
+        onSuccess: () => setLocation("/admin132"),
         onError: () => setError("Invalid password. Try nano-admin-2024"),
       }
     );

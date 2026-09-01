@@ -135,7 +135,7 @@ export default function AdminDashboard() {
       <Card className="border-border/80 bg-card/80">
         <CardHeader className="flex flex-row items-center justify-between border-b border-border/70 pb-4">
           <CardTitle className="font-display text-sm uppercase tracking-[0.12em]">Recent Orders</CardTitle>
-          <Link href="/admin/orders" className="text-[10px] font-black uppercase tracking-[0.18em] text-accent transition-colors hover:text-foreground">
+          <Link href="/admin132/orders" className="text-[10px] font-black uppercase tracking-[0.18em] text-accent transition-colors hover:text-foreground">
             View All
           </Link>
         </CardHeader>

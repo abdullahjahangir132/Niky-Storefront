@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { MegaMenuPanel, useNavMenu } from "./mega-menu";
 import SearchOverlay from "@/components/storefront/search-overlay";
+import { useStoreSettings } from "@/hooks/use-store-settings";
 
 const MEGA_MENU_CATEGORIES = [
   { value: "men", label: "Men" },
@@ -22,6 +23,8 @@ export default function StoreNavbar() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [location] = useLocation();
   const navMenu = useNavMenu();
+  const { data: settings } = useStoreSettings();
+  const storeName = settings?.storeName?.trim() || "NANO SHOES";
 
   useEffect(() => {
     const handleScroll = () => {
@@ -60,8 +63,8 @@ export default function StoreNavbar() {
             {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
 
-          <Link href="/" className="font-display text-[1.35rem] font-black tracking-[-0.08em] text-foreground md:text-3xl">
-            NANO<span className="text-accent">SHOES</span>
+           <Link href="/" aria-label={storeName} className="font-display text-[1.35rem] font-black tracking-[-0.08em] text-foreground md:text-3xl">
+             {storeName}
           </Link>
         </div>
 

@@ -6,16 +6,16 @@ export function AdminSidebar({ mobileOpen = false, onClose }: { mobileOpen?: boo
   const [location] = useLocation();
 
   const links = [
-    { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
-    { href: "/admin/products", label: "Products", icon: ShoppingBag },
-    { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
-    { href: "/admin/customers", label: "Customers", icon: Users },
-    { href: "/admin/categories", label: "Categories", icon: Tags },
-    { href: "/admin/coupons", label: "Coupons", icon: Ticket },
-    { href: "/admin/hero-slides", label: "Hero Slides", icon: GalleryHorizontal },
-    { href: "/admin/themes", label: "Themes", icon: Palette },
-    { href: "/admin/ai-usage", label: "AI Usage", icon: Bot },
-    { href: "/admin/settings", label: "Settings", icon: Settings },
+    { href: "/admin132", label: "Dashboard", icon: LayoutDashboard, exact: true },
+    { href: "/admin132/products", label: "Products", icon: ShoppingBag },
+    { href: "/admin132/orders", label: "Orders", icon: ShoppingCart },
+    { href: "/admin132/customers", label: "Customers", icon: Users },
+    { href: "/admin132/categories", label: "Categories", icon: Tags },
+    { href: "/admin132/coupons", label: "Coupons", icon: Ticket },
+    { href: "/admin132/hero-slides", label: "Hero Slides", icon: GalleryHorizontal },
+    { href: "/admin132/themes", label: "Themes", icon: Palette },
+    { href: "/admin132/ai-usage", label: "AI Usage", icon: Bot },
+    { href: "/admin132/settings", label: "Settings", icon: Settings },
   ];
 
   return (

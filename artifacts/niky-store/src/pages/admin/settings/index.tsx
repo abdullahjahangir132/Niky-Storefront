@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
+import { getStoreSettingsQueryKey, PublicStoreSettings } from "@/hooks/use-store-settings";
 import { Save, Upload, Instagram, Facebook, Store, Smartphone, Globe, Phone, MessageCircle, Bot, Eye, EyeOff, CheckCircle2, Plus, Trash2, Megaphone, Tag } from "lucide-react";
 
 async function uploadImage(file: File): Promise<string> {
@@ -74,9 +75,15 @@ export default function AdminSettings() {
 
   const updateSettings = useUpdateSettings({
     mutation: {
-      onSuccess: () => {
+      onSuccess: (savedSettings) => {
         toast({ title: "Settings saved ✓" });
+        queryClient.setQueryData(getGetSettingsQueryKey(), savedSettings);
+        queryClient.setQueryData<PublicStoreSettings>(
+          getStoreSettingsQueryKey(),
+          (current) => ({ ...current, storeName: savedSettings.storeName }),
+        );
         queryClient.invalidateQueries({ queryKey: getGetSettingsQueryKey() });
+        queryClient.invalidateQueries({ queryKey: getStoreSettingsQueryKey() });
       },
       onError: (err: any) => toast({ title: err.message || "Error saving settings", variant: "destructive" }),
     },

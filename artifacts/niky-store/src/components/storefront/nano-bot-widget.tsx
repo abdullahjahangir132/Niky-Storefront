@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowUp, MessageCircle, X, Bot } from "lucide-react";
+import { ArrowUp, MessageCircle, X, Bot, Mic, MicOff, Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -131,6 +131,49 @@ interface Message {
   content: string;
 }
 
+interface SpeechRecognitionAlternativeLike {
+  transcript: string;
+}
+
+interface SpeechRecognitionResultLike {
+  [index: number]: SpeechRecognitionAlternativeLike;
+  isFinal: boolean;
+  length: number;
+}
+
+interface SpeechRecognitionEventLike extends Event {
+  resultIndex: number;
+  results: {
+    [index: number]: SpeechRecognitionResultLike;
+    length: number;
+  };
+}
+
+interface SpeechRecognitionErrorEventLike extends Event {
+  error: string;
+}
+
+interface SpeechRecognitionLike {
+  lang: string;
+  continuous: boolean;
+  interimResults: boolean;
+  onresult: ((event: SpeechRecognitionEventLike) => void) | null;
+  onerror: ((event: SpeechRecognitionErrorEventLike) => void) | null;
+  onend: (() => void) | null;
+  start: () => void;
+  stop: () => void;
+  abort: () => void;
+}
+
+type SpeechRecognitionConstructor = new () => SpeechRecognitionLike;
+
+const SPEECH_LOCALES: Record<Language, string> = {
+  en: "en-US",
+  rur: "ur-PK",
+  ar: "ar-SA",
+  ur: "ur-PK",
+};
+
 const COPY = {
   en: {
     title: "Nano Bot",
@@ -224,8 +267,12 @@ export function NanoBotWidget() {
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [voiceError, setVoiceError] = useState<string | null>(null);
+  const [speakingMessageIndex, setSpeakingMessageIndex] = useState<number | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
 
   const copy = COPY[language];
   const dir = language === "ar" || language === "ur" ? "rtl" : "ltr";
@@ -238,11 +285,103 @@ export function NanoBotWidget() {
     if (open) setTimeout(() => inputRef.current?.focus(), 260);
   }, [open]);
 
+  useEffect(() => {
+    return () => {
+      recognitionRef.current?.abort();
+      window.speechSynthesis?.cancel();
+    };
+  }, []);
+
   function switchLanguage(lang: Language) {
+    recognitionRef.current?.stop();
+    window.speechSynthesis?.cancel();
+    setIsListening(false);
+    setSpeakingMessageIndex(null);
+    setVoiceError(null);
     setLanguage(lang);
     setMessages([{ role: "assistant", content: COPY[lang].greeting }]);
     setInput("");
   }
+
+  const toggleListening = () => {
+    if (loading) return;
+
+    const speechWindow = window as Window & {
+      SpeechRecognition?: SpeechRecognitionConstructor;
+      webkitSpeechRecognition?: SpeechRecognitionConstructor;
+    };
+    const SpeechRecognition = speechWindow.SpeechRecognition ?? speechWindow.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      setVoiceError("Voice input is not supported in this browser.");
+      return;
+    }
+
+    if (isListening) {
+      recognitionRef.current?.stop();
+      return;
+    }
+
+    setVoiceError(null);
+    const recognition = new SpeechRecognition();
+    recognition.lang = SPEECH_LOCALES[language];
+    recognition.continuous = false;
+    recognition.interimResults = true;
+    recognition.onresult = (event) => {
+      let transcript = "";
+      for (let index = event.resultIndex; index < event.results.length; index += 1) {
+        transcript += event.results[index][0].transcript;
+      }
+      setInput(transcript.trim());
+    };
+    recognition.onerror = (event) => {
+      setIsListening(false);
+      recognitionRef.current = null;
+      if (event.error !== "aborted") {
+        setVoiceError(
+          event.error === "not-allowed" || event.error === "service-not-allowed"
+            ? "Microphone access was blocked. Allow it in your browser to use voice input."
+            : "Voice input could not hear you. Please try again.",
+        );
+      }
+    };
+    recognition.onend = () => {
+      setIsListening(false);
+      recognitionRef.current = null;
+    };
+    recognitionRef.current = recognition;
+    setIsListening(true);
+
+    try {
+      recognition.start();
+    } catch {
+      setIsListening(false);
+      recognitionRef.current = null;
+      setVoiceError("Voice input could not start. Please try again.");
+    }
+  };
+
+  const speakMessage = (text: string, messageIndex: number) => {
+    if (!("speechSynthesis" in window) || typeof SpeechSynthesisUtterance === "undefined") {
+      setVoiceError("Read aloud is not supported in this browser.");
+      return;
+    }
+
+    if (speakingMessageIndex === messageIndex) {
+      window.speechSynthesis.cancel();
+      setSpeakingMessageIndex(null);
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = SPEECH_LOCALES[language];
+    utterance.onend = () => setSpeakingMessageIndex(null);
+    utterance.onerror = () => setSpeakingMessageIndex(null);
+    setVoiceError(null);
+    setSpeakingMessageIndex(messageIndex);
+    window.speechSynthesis.speak(utterance);
+  };
 
   const sendMessage = async (content?: string) => {
     const text = (content ?? input).trim();
@@ -383,7 +522,7 @@ export function NanoBotWidget() {
                       <div className="mt-1 h-7 w-7 rounded-full bg-accent flex-shrink-0 flex items-center justify-center">
                         <Bot className="h-3.5 w-3.5 text-white" />
                       </div>
-                      <div className="rounded-2xl rounded-tl-sm bg-white border border-zinc-200 px-4 py-3 text-zinc-800 shadow-sm min-h-[2.5rem]">
+                       <div className="relative rounded-2xl rounded-tl-sm bg-white border border-zinc-200 px-4 py-3 pr-11 text-zinc-800 shadow-sm min-h-[2.5rem]">
                         {message.content ? (
                           <MsgContent text={message.content} />
                         ) : loading && index === messages.length - 1 ? (
@@ -393,6 +532,21 @@ export function NanoBotWidget() {
                             <span className="h-2 w-2 animate-bounce rounded-full bg-zinc-400 [animation-delay:240ms]" />
                           </span>
                         ) : null}
+                         {message.content && (
+                           <button
+                             type="button"
+                             onClick={() => speakMessage(message.content, index)}
+                             aria-label={speakingMessageIndex === index ? "Stop speaking" : "Read message aloud"}
+                             title={speakingMessageIndex === index ? "Stop speaking" : "Read message aloud"}
+                             className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-accent"
+                           >
+                             {speakingMessageIndex === index ? (
+                               <VolumeX className="h-3.5 w-3.5" />
+                             ) : (
+                               <Volume2 className="h-3.5 w-3.5" />
+                             )}
+                           </button>
+                         )}
                       </div>
                     </div>
                   ) : (
@@ -424,27 +578,52 @@ export function NanoBotWidget() {
             </div>
 
             {/* Input */}
-            <div className="flex items-center gap-2 border-t border-zinc-100 bg-white p-3 flex-shrink-0">
-              <Input
-                ref={inputRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
-                }}
-                placeholder={copy.placeholder}
-                disabled={loading}
-                className="h-10 rounded-full border-zinc-200 px-4 text-sm focus-visible:ring-1 focus-visible:ring-accent focus-visible:border-accent"
-                dir={dir}
-              />
-              <Button
-                size="icon"
-                className="h-10 w-10 rounded-full bg-[#111] text-white hover:bg-accent flex-shrink-0"
-                onClick={() => sendMessage()}
-                disabled={!input.trim() || loading}
-              >
-                <ArrowUp className="h-4 w-4" />
-              </Button>
+            <div className="border-t border-zinc-100 bg-white p-3 flex-shrink-0">
+              {voiceError && (
+                <p className="mb-2 px-1 text-[11px] leading-relaxed text-red-600" role="status">
+                  {voiceError}
+                </p>
+              )}
+              <div className="flex items-center gap-2">
+                <Input
+                  ref={inputRef}
+                  value={input}
+                  onChange={(e) => {
+                    setInput(e.target.value);
+                    if (voiceError) setVoiceError(null);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+                  }}
+                  placeholder={copy.placeholder}
+                  disabled={loading}
+                  className="h-10 rounded-full border-zinc-200 px-4 text-sm focus-visible:ring-1 focus-visible:ring-accent focus-visible:border-accent"
+                  dir={dir}
+                />
+                <button
+                  type="button"
+                  onClick={toggleListening}
+                  disabled={loading}
+                  aria-label={isListening ? "Stop listening" : "Use microphone"}
+                  title={isListening ? "Stop listening" : "Use microphone"}
+                  className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
+                    isListening
+                      ? "bg-red-100 text-red-600 animate-pulse"
+                      : "text-zinc-500 hover:bg-zinc-100 hover:text-accent"
+                  }`}
+                >
+                  {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                </button>
+                <Button
+                  size="icon"
+                  className="h-10 w-10 rounded-full bg-[#111] text-white hover:bg-accent flex-shrink-0"
+                  onClick={() => sendMessage()}
+                  disabled={!input.trim() || loading}
+                  aria-label="Send message"
+                >
+                  <ArrowUp className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </motion.div>
         )}
