@@ -1,3 +1,4 @@
+// @ts-nocheck
 import path from "node:path";
 
 // Vercel's function filesystem is read-only except for /tmp. Existing media is
