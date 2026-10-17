@@ -1,20 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "installCommand": "pnpm install --frozen-lockfile",
+  "installCommand": "pnpm install --no-frozen-lockfile",
   "buildCommand": "pnpm --filter @workspace/niky-store run build && node scripts/copy-store-uploads.mjs",
   "outputDirectory": "artifacts/niky-store/dist/public",
-  "functions": {
-    "api/index.ts": {
-      "maxDuration": 60,
-      "memory": 1024
-    }
-  },
   "rewrites": [
-    {
-      "source": "/api/:path*",
-      "destination": "/api/index?__vercel_original_path=/api/:path*"
-    },
     {
       "source": "/(.*)",
       "destination": "/index.html"
