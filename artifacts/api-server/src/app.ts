@@ -2,11 +2,14 @@ import express, { type Express } from "express";
 import cors from "cors";
 import session from "express-session";
 import pinoHttp from "pino-http";
-import path from "path";
 import router from "./routes";
 import { logger } from "./lib/logger";
+import { uploadDir } from "./lib/upload-dir";
 
 const app: Express = express();
+// Vercel terminates HTTPS before invoking the function. Trust the first proxy
+// so Express can correctly identify secure requests and set session cookies.
+app.set("trust proxy", 1);
 
 app.use(
   pinoHttp({
@@ -35,7 +38,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: false,
+      secure: process.env.NODE_ENV === "production",
       httpOnly: true,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     },
@@ -45,7 +48,6 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const uploadDir = path.join(process.cwd(), "uploads");
 app.use("/api/uploads", express.static(uploadDir));
 app.use("/api", router);
 
