@@ -1,0 +1,17 @@
+# The storefront lives in artifacts/niky-store, but it depends on other pnpm
+# workspace packages, so the build runs from the repository root.
+[build]
+  base = ""
+  command = "pnpm --filter @workspace/niky-store run build && node scripts/copy-store-uploads.mjs"
+  # vite.config.ts writes the build to dist/public inside the storefront package.
+  publish = "artifacts/niky-store/dist/public"
+
+# Pin Node explicitly (see redwood.toml for why framework defaults are ignored).
+[build.environment]
+  NODE_VERSION = "24"
+
+# Client-side routes (wouter) should all serve the SPA entry point.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
