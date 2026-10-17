@@ -1,0 +1,8 @@
+# This is NOT a RedwoodJS project. Do not delete without reading below.
+#
+# Netlify's CLI refuses to deploy from the root of a pnpm monorepo in
+# non-interactive runs unless a workspace package is selected with --filter.
+# The presence of this file makes Netlify's project detection skip pnpm
+# workspace detection, so deploys use the root netlify.toml, which builds
+# artifacts/niky-store explicitly. The build command and publish directory in
+# netlify.toml override any framework defaults implied by this file.
