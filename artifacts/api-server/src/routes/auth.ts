@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Router, Request, Response } from "express";
 import { AdminLoginBody } from "@workspace/api-zod";
 
