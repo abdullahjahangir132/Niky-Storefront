@@ -6,7 +6,8 @@ import { Link } from "wouter";
 import { formatPrice } from "@/lib/utils";
 
 export default function CartDrawer() {
-  const { isCartDrawerOpen, setIsCartDrawerOpen, items, itemCount, subtotal, updateQty, removeItem } = useCart();
+  const { isCartDrawerOpen, setIsCartDrawerOpen, items = [], itemCount, subtotal, updateQty, removeItem } = useCart();
+  const safeItems = items || [];
 
   return (
     <Sheet open={isCartDrawerOpen} onOpenChange={setIsCartDrawerOpen}>
@@ -20,7 +21,7 @@ export default function CartDrawer() {
         </div>
 
         <div className="flex-1 overflow-auto p-6 space-y-6 bg-secondary/10">
-          {!items.length ? (
+          {!safeItems.length ? (
             <div className="h-full flex flex-col items-center justify-center text-center space-y-4">
               <div className="w-20 h-20 rounded-full bg-secondary/50 flex items-center justify-center">
                 <ShoppingBag className="w-10 h-10 text-muted-foreground" />
@@ -35,7 +36,7 @@ export default function CartDrawer() {
             </div>
           ) : (
             <div className="space-y-6">
-              {items.map((item) => (
+              {safeItems.map((item) => (
                 <div key={item.id} className="flex gap-4 group bg-card p-3 rounded-lg border border-border">
                   <div className="w-24 h-24 bg-secondary/20 rounded-md overflow-hidden flex-shrink-0 relative">
                     <img src={item.productImageUrl} alt={item.productName} className="w-full h-full object-cover" />
@@ -73,7 +74,7 @@ export default function CartDrawer() {
           )}
         </div>
 
-        {items.length > 0 && (
+        {safeItems.length > 0 && (
           <div className="p-6 border-t border-border bg-card">
             <div className="flex justify-between items-center mb-6">
               <span className="font-display text-xl uppercase font-bold text-muted-foreground">Subtotal</span>
