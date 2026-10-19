@@ -22,14 +22,14 @@ const FALLBACK_SLIDE = {
 };
 
 interface SlideLike {
-  mediaType: string;
-  imageUrl: string;
+  mediaType?: string;
+  imageUrl?: string;
   imageUrl2?: string;
   videoUrl?: string;
 }
 
 function SlideMedia({ slide }: { slide: SlideLike }) {
-  if (slide.mediaType === "video" && slide.videoUrl) {
+  if (slide?.mediaType === "video" && slide?.videoUrl) {
     return (
       <video
         src={slide.videoUrl}
@@ -42,21 +42,21 @@ function SlideMedia({ slide }: { slide: SlideLike }) {
     );
   }
 
-  if (slide.imageUrl2) {
+  if (slide?.imageUrl2) {
     return (
       <div className="w-full h-full grid grid-cols-2">
-        <img src={slide.imageUrl} alt="" className="w-full h-full object-cover" loading="eager" />
+        <img src={slide.imageUrl || FALLBACK_SLIDE.imageUrl} alt="" className="w-full h-full object-cover" loading="eager" />
         <img src={slide.imageUrl2} alt="" className="w-full h-full object-cover" loading="eager" />
       </div>
     );
   }
 
-  return <img src={slide.imageUrl} alt="" className="w-full h-full object-cover" loading="eager" />;
+  return <img src={slide?.imageUrl || FALLBACK_SLIDE.imageUrl} alt="" className="w-full h-full object-cover" loading="eager" />;
 }
 
 export default function HeroCarousel() {
   const { data } = useListHeroSlides();
-  const slides = data && data.length > 0 ? data : [FALLBACK_SLIDE];
+  const slides = Array.isArray(data) && data.length > 0 ? data : [FALLBACK_SLIDE];
 
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(true);
@@ -107,17 +107,17 @@ export default function HeroCarousel() {
             exit={{ opacity: 0, y: -16 }}
             transition={{ duration: 0.5 }}
           >
-            {slide.subtitle && (
+            {slide?.subtitle && (
               <p className="mb-4 text-[11px] font-black uppercase tracking-[0.28em] text-accent sm:text-sm">{slide.subtitle}</p>
             )}
-            {slide.title && (
-                <h1 className="mb-6 whitespace-pre-line font-display text-5xl font-black uppercase leading-[0.9] tracking-[-0.07em] text-white sm:text-6xl md:text-7xl lg:text-8xl">
+            {slide?.title && (
+              <h1 className="mb-6 whitespace-pre-line font-display text-5xl font-black uppercase leading-[0.9] tracking-[-0.07em] text-white sm:text-6xl md:text-7xl lg:text-8xl">
                 {slide.title}
               </h1>
             )}
-            {(slide.ctaText || slide.secondaryCtaText) && (
+            {(slide?.ctaText || slide?.secondaryCtaText) && (
               <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
-                {slide.ctaText && (
+                {slide?.ctaText && (
                   <Link
                     href={slide.ctaLink || "/shop"}
                     className="flex h-14 w-full items-center justify-center rounded-xl bg-accent px-9 font-display text-sm font-black uppercase tracking-[0.16em] text-white transition-[transform,background-color] hover:-translate-y-0.5 hover:bg-accent/90 sm:w-auto"
@@ -125,7 +125,7 @@ export default function HeroCarousel() {
                     {slide.ctaText}<span className="ml-3 text-lg leading-none">↗</span>
                   </Link>
                 )}
-                {slide.secondaryCtaText && (
+                {slide?.secondaryCtaText && (
                   <Link
                     href={slide.secondaryCtaLink || "/shop"}
                     className="flex h-14 w-full items-center justify-center rounded-xl bg-white px-9 font-display text-sm font-black uppercase tracking-[0.16em] text-[#09090a] transition-[transform,background-color] hover:-translate-y-0.5 hover:bg-accent hover:text-white sm:w-auto"
@@ -157,9 +157,9 @@ export default function HeroCarousel() {
           </button>
 
           <div className="absolute bottom-7 left-1/2 z-20 flex -translate-x-1/2 items-center gap-2.5 sm:bottom-9 sm:gap-3">
-            {slides.map((s, i) => (
+            {slides.map((s: any, i: number) => (
               <button
-                key={s.id ?? i}
+                key={s?.id ?? i}
                 aria-label={`Go to slide ${i + 1}`}
                 onClick={() => goTo(i)}
                 className={cn(
@@ -171,7 +171,7 @@ export default function HeroCarousel() {
             <button
               aria-label={playing ? "Pause slideshow" : "Play slideshow"}
               onClick={() => setPlaying((p) => !p)}
-                 className="ml-1 flex h-8 w-8 items-center justify-center rounded-xl border-2 border-white bg-black/60 text-white transition-colors hover:border-accent hover:bg-accent"
+              className="ml-1 flex h-8 w-8 items-center justify-center rounded-xl border-2 border-white bg-black/60 text-white transition-colors hover:border-accent hover:bg-accent"
             >
               {playing ? <Pause size={12} /> : <Play size={12} />}
             </button>
